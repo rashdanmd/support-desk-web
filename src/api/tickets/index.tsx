@@ -1,13 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-
-export type CreateTicketData = {
-  title: string;
-  description: string;
-  teamId: number;
-  affectedUrl?: string;
-  curl?: string;
-  priority: "low" | "medium" | "high" | "urgent";
-};
+import type { CreateTicketData, Ticket } from "./types";
 
 export const createTicket = async (data: CreateTicketData) => {
   const supabase = createClient();
@@ -39,7 +31,7 @@ export const createTicket = async (data: CreateTicketData) => {
   return response.json();
 };
 
-export const getTicketById = async (id: number) => {
+export const getTicketById = async (id: number): Promise<Ticket> => {
   const supabase = createClient();
 
   const {
