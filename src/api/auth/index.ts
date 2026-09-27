@@ -38,3 +38,18 @@ export const signUpWithEmail = async (
 
   return data;
 };
+
+export const getAccessToken = async (): Promise<string> => {
+  const supabase = createClient();
+
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error || !session) {
+    throw new Error("User is not authenticated");
+  }
+
+  return session.access_token;
+};

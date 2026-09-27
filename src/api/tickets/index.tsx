@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 import type { CreateTicketData, Ticket } from "./types";
+import { getAccessToken } from "@/api/auth";
 
 export const createTicket = async (data: CreateTicketData) => {
   const supabase = createClient();
@@ -59,21 +60,13 @@ export const getTicketById = async (id: number): Promise<Ticket> => {
 };
 
 export const getTickets = async (): Promise<Ticket[]> => {
-  const supabase = createClient();
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    throw new Error("User is not authenticated");
-  }
+  const accessToken = await getAccessToken();
 
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/tickets`,
     {
       headers: {
-        Authorization: `Bearer ${session.access_token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     },
   );

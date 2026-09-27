@@ -12,6 +12,11 @@ export default function TicketDetails() {
 
   useEffect(() => {
     const loadTicket = async () => {
+      const id = Number(params.id);
+
+      if (Number.isNaN(id)) {
+        return;
+      }
       try {
         const data = await getTicketById(Number(params.id));
         setTicket(data);
