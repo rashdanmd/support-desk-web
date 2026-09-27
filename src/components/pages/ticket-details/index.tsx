@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 
-import { getTicketById } from "@/api/tickets";
+import { cancelTicket, getTicketById } from "@/api/tickets";
 import type { Ticket } from "@/api/tickets/types";
 import { createClient } from "@/lib/supabase/client";
 
@@ -45,7 +46,25 @@ export default function TicketDetails() {
     return <p>Loading ticket...</p>;
   }
 
-  const canEdit = ticket.created_by === userId && ticket.status === "pending";
+  const canManage = ticket.created_by === userId && ticket.status === "pending";
+
+  const handleCancel = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to cancel this ticket?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const cancelledTicket = await cancelTicket(ticket.id);
+
+      setTicket(cancelledTicket);
+    } catch (error) {
+      console.error("Failed to cancel ticket:", error);
+    }
+  };
 
   return (
     <main>
@@ -56,11 +75,15 @@ export default function TicketDetails() {
       <p>Status: {ticket.status}</p>
       <p>Priority: {ticket.priority}</p>
 
-      <p>Ticket owner: {ticket.created_by}</p>
-      <p>Current user: {userId}</p>
-      <p>Ticket status: {ticket.status}</p>
+      {canManage && (
+        <>
+          <Link href={`/tickets/${ticket.id}/edit`}>Edit ticket</Link>
 
-      {canEdit && <button type="button">Edit ticket</button>}
+          <button type="button" onClick={handleCancel}>
+            Cancel ticket
+          </button>
+        </>
+      )}
 
       <h2>Description</h2>
       <p>{ticket.description}</p>

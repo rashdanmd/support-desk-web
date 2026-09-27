@@ -102,3 +102,23 @@ export const updateTicket = async (
 
   return response.json();
 };
+
+export const cancelTicket = async (id: number): Promise<Ticket> => {
+  const accessToken = await getAccessToken();
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/tickets/${id}/cancel`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to cancel ticket");
+  }
+
+  return response.json();
+};

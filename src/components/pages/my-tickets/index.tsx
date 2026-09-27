@@ -1,44 +1,71 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 
-import { getTickets } from "@/api/tickets";
+import { cancelTicket, getTickets } from "@/api/tickets";
 import type { Ticket } from "@/api/tickets/types";
+import { createClient } from "@/lib/supabase/client";
 
 export default function MyTickets() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
   useEffect(() => {
-    const loadMyTickets = async () => {
-      const supabase = createClient();
+    const loadTickets = async () => {
+      try {
+        const supabase = createClient();
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-      if (!user) {
-        return;
+        if (!user) {
+          return;
+        }
+
+        const data = await getTickets();
+
+        const userTickets = data.filter(
+          (ticket) => ticket.created_by === user.id,
+        );
+
+        setTickets(userTickets);
+      } catch (error) {
+        console.error("Failed to load tickets:", error);
       }
-
-      const tickets = await getTickets();
-
-      const myTickets = tickets.filter(
-        (ticket) => ticket.created_by === user.id,
-      );
-
-      setTickets(myTickets);
     };
 
-    loadMyTickets();
+    loadTickets();
   }, []);
+
+  const handleCancel = async (id: number) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to cancel this ticket?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const cancelledTicket = await cancelTicket(id);
+
+      setTickets((currentTickets) =>
+        currentTickets.map((ticket) =>
+          ticket.id === id ? cancelledTicket : ticket,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to cancel ticket:", error);
+    }
+  };
 
   return (
     <main>
-      <h1>My tickets</h1>
+      <h1>My Tickets</h1>
 
       {tickets.map((ticket) => {
-        const canEdit = ticket.status === "pending";
+        const canManage = ticket.status === "pending";
 
         return (
           <div key={ticket.id}>
@@ -51,8 +78,14 @@ export default function MyTickets() {
             <p>Status: {ticket.status}</p>
             <p>Priority: {ticket.priority}</p>
 
-            {canEdit && (
-              <Link href={`/tickets/${ticket.id}/edit`}>Edit ticket</Link>
+            {canManage && (
+              <>
+                <Link href={`/tickets/${ticket.id}/edit`}>Edit ticket</Link>
+
+                <button type="button" onClick={() => handleCancel(ticket.id)}>
+                  Cancel ticket
+                </button>
+              </>
             )}
           </div>
         );
