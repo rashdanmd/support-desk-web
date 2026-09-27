@@ -32,6 +32,11 @@ export type Ticket = {
     id: string;
     display_name: string;
   };
+
+  team: {
+    id: number;
+    name: string;
+  };
 };
 
 export type CreateTicketData = {

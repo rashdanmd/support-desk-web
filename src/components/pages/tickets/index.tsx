@@ -35,6 +35,7 @@ export default function Tickets() {
           <p>{ticket.description}</p>
 
           <p>Raised by: {ticket.creator.display_name}</p>
+          <p>Team: {ticket.team.name}</p>
           <p>Status: {ticket.status}</p>
           <p>Priority: {ticket.priority}</p>
         </div>
