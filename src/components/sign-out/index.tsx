@@ -16,6 +16,7 @@ export default function SignOut() {
       return;
     }
 
+    router.push("/");
     router.refresh();
   };
 
