@@ -30,7 +30,9 @@ export default function SignUp() {
     try {
       await signUpWithEmail(data.name, data.email, data.password);
 
-      setMessage("Account created successfully.");
+      setMessage(
+        "Account created. Please check your email to confirm your account before signing in.",
+      );
     } catch (error) {
       setSignUpError(
         error instanceof Error ? error.message : "Unable to create account",
