@@ -8,6 +8,7 @@ import type { Ticket } from "@/api/tickets/types";
 
 export default function Tickets() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const loadTickets = async () => {
@@ -23,10 +24,30 @@ export default function Tickets() {
     loadTickets();
   }, []);
 
+  const filteredTickets = tickets.filter((ticket) => {
+    const search = searchTerm.toLowerCase();
+
+    return (
+      ticket.title.toLowerCase().includes(search) ||
+      ticket.description.toLowerCase().includes(search) ||
+      ticket.team.name.toLowerCase().includes(search) ||
+      ticket.status.toLowerCase().includes(search) ||
+      ticket.priority.toLowerCase().includes(search) ||
+      ticket.creator.display_name.toLowerCase().includes(search)
+    );
+  });
+
   return (
     <main>
       <h1>Support requests</h1>
-      {tickets.map((ticket) => (
+
+      <input
+        type="search"
+        placeholder="Search support requests"
+        value={searchTerm}
+        onChange={(event) => setSearchTerm(event.target.value)}
+      />
+      {filteredTickets.map((ticket) => (
         <div key={ticket.id}>
           <h2>
             <Link href={`/tickets/${ticket.id}`}>{ticket.title}</Link>

@@ -51,7 +51,7 @@ export default function CreateTicket() {
 
         <div>
           <label htmlFor="affectedUrl">Affected URL</label>
-          <input id="affectedUrl" name="affectedUrl" type="url" />
+          <input id="affectedUrl" name="affectedUrl" />
         </div>
 
         <div>
