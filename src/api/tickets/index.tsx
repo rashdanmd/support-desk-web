@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import type { CreateTicketData, Ticket } from "./types";
+import type { CreateTicketData, Ticket, UpdateTicketData } from "./types";
 import { getAccessToken } from "@/api/auth";
 
 export const createTicket = async (data: CreateTicketData) => {
@@ -73,6 +73,31 @@ export const getTickets = async (): Promise<Ticket[]> => {
 
   if (!response.ok) {
     throw new Error("Failed to get tickets");
+  }
+
+  return response.json();
+};
+
+export const updateTicket = async (
+  id: number,
+  data: UpdateTicketData,
+): Promise<Ticket> => {
+  const accessToken = await getAccessToken();
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/tickets/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to update ticket");
   }
 
   return response.json();

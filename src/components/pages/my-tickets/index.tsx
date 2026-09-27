@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 import { getTickets } from "@/api/tickets";
@@ -36,12 +37,26 @@ export default function MyTickets() {
     <main>
       <h1>My tickets</h1>
 
-      {tickets.map((ticket) => (
-        <>
-          <p key={ticket.id}>{ticket.title}</p>
-          <p>Created by: {ticket.created_by}</p>
-        </>
-      ))}
+      {tickets.map((ticket) => {
+        const canEdit = ticket.status === "pending";
+
+        return (
+          <div key={ticket.id}>
+            <h2>
+              <Link href={`/tickets/${ticket.id}`}>{ticket.title}</Link>
+            </h2>
+
+            <p>{ticket.description}</p>
+            <p>Team: {ticket.team.name}</p>
+            <p>Status: {ticket.status}</p>
+            <p>Priority: {ticket.priority}</p>
+
+            {canEdit && (
+              <Link href={`/tickets/${ticket.id}/edit`}>Edit ticket</Link>
+            )}
+          </div>
+        );
+      })}
     </main>
   );
 }
