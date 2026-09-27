@@ -1,5 +1,11 @@
 import { createClient } from "@/lib/supabase/client";
-import type { CreateTicketData, Ticket, UpdateTicketData } from "./types";
+import type {
+  CreateTicketData,
+  Ticket,
+  UpdateTicketData,
+  ReferTicketData,
+  ResolveTicketData,
+} from "./types";
 import { getAccessToken } from "@/api/auth";
 
 export const createTicket = async (data: CreateTicketData) => {
@@ -121,4 +127,92 @@ export const cancelTicket = async (id: number): Promise<Ticket> => {
   }
 
   return response.json();
+};
+
+export const startTicketReview = async (id: number): Promise<Ticket> => {
+  const accessToken = await getAccessToken();
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/tickets/${id}/review`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to start ticket review");
+  }
+
+  return response.json();
+};
+
+export const referTicket = async (
+  id: number,
+  data: ReferTicketData,
+): Promise<Ticket> => {
+  const accessToken = await getAccessToken();
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/tickets/${id}/refer`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to refer ticket");
+  }
+
+  return response.json();
+};
+
+export const resolveTicket = async (
+  id: number,
+  data: ResolveTicketData,
+): Promise<Ticket> => {
+  const accessToken = await getAccessToken();
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/tickets/${id}/resolve`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to resolve ticket");
+  }
+
+  return response.json();
+};
+
+export const deleteTicket = async (id: number): Promise<void> => {
+  const accessToken = await getAccessToken();
+
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/tickets/${id}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to delete ticket");
+  }
 };

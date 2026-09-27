@@ -56,3 +56,11 @@ export type UpdateTicketData = {
   curl?: string;
   priority?: TicketPriority;
 };
+
+export type ReferTicketData = {
+  message: string;
+};
+
+export type ResolveTicketData = {
+  resolution: string;
+};
