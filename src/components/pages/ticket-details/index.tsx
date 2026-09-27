@@ -8,6 +8,8 @@ import { cancelTicket, getTicketById } from "@/api/tickets";
 import type { Ticket } from "@/api/tickets/types";
 import { createClient } from "@/lib/supabase/client";
 
+import TicketResponses from "./components/ticket-responses";
+
 export default function TicketDetails() {
   const params = useParams<{ id: string }>();
 
@@ -32,7 +34,6 @@ export default function TicketDetails() {
         setUserId(user?.id ?? null);
 
         const data = await getTicketById(id);
-
         setTicket(data);
       } catch (error) {
         console.error("Failed to load ticket:", error);
@@ -101,6 +102,11 @@ export default function TicketDetails() {
           <pre>{ticket.curl}</pre>
         </>
       )}
+
+      <TicketResponses
+        ticketId={ticket.id}
+        canRespond={ticket.created_by === userId}
+      />
     </main>
   );
 }
