@@ -6,15 +6,14 @@ import { useParams } from "next/navigation";
 
 import { cancelTicket, getTicketById } from "@/api/tickets";
 import type { Ticket } from "@/api/tickets/types";
-import { createClient } from "@/lib/supabase/client";
-
+import { getCurrentUser, type CurrentUser } from "@/api/users";
 import TicketResponses from "./components/ticket-responses";
 
 export default function TicketDetails() {
   const params = useParams<{ id: string }>();
 
   const [ticket, setTicket] = useState<Ticket | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
   useEffect(() => {
     const loadTicket = async () => {
@@ -25,13 +24,8 @@ export default function TicketDetails() {
       }
 
       try {
-        const supabase = createClient();
-
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        setUserId(user?.id ?? null);
+        const user = await getCurrentUser();
+        setCurrentUser(user);
 
         const data = await getTicketById(id);
         setTicket(data);
@@ -47,7 +41,8 @@ export default function TicketDetails() {
     return <p>Loading ticket...</p>;
   }
 
-  const canManage = ticket.created_by === userId && ticket.status === "pending";
+  const canManage =
+    ticket.created_by === currentUser?.id && ticket.status === "pending";
 
   const handleCancel = async () => {
     const confirmed = window.confirm(
@@ -105,7 +100,11 @@ export default function TicketDetails() {
 
       <TicketResponses
         ticketId={ticket.id}
-        canRespond={ticket.created_by === userId}
+        canRespond={
+          ticket.created_by === currentUser?.id ||
+          currentUser?.role === "support" ||
+          currentUser?.role === "admin"
+        }
       />
     </main>
   );
