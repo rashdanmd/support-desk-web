@@ -70,6 +70,8 @@ export default function TicketDetails({
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     const loadTicket = async () => {
@@ -122,20 +124,17 @@ export default function TicketDetails({
   const canDelete = currentUser?.role === "admin";
 
   const handleCancel = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to cancel this ticket?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
+    setIsCancelling(true);
 
     try {
       const cancelledTicket = await cancelTicket(ticket.id);
 
       setTicket(cancelledTicket);
+      setConfirmCancel(false);
     } catch (error) {
       console.error("Failed to cancel ticket:", error);
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -220,7 +219,7 @@ export default function TicketDetails({
               <ButtonLink href={`/tickets/${ticket.id}/edit`}>
                 Edit ticket
               </ButtonLink>
-              <Button type="button" onClick={handleCancel}>
+              <Button type="button" onClick={() => setConfirmCancel(true)}>
                 Cancel ticket
               </Button>
             </>
@@ -317,6 +316,19 @@ export default function TicketDetails({
         pending={isDeleting}
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
+      />
+
+      <ConfirmDialog
+        open={confirmCancel}
+        title="Cancel this ticket?"
+        description="This withdraws the request from the help team."
+        confirmLabel="Cancel ticket"
+        pendingLabel="Cancelling…"
+        cancelLabel="Keep ticket"
+        tone="danger"
+        pending={isCancelling}
+        onConfirm={handleCancel}
+        onCancel={() => setConfirmCancel(false)}
       />
 
       <TicketResponses

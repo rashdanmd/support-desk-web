@@ -12,12 +12,11 @@ import {
   Button,
   EmptyState,
   Page,
-  PageDescription,
   PageHeader,
-  PageTitle,
 } from "@/components/ui";
 
 import {
+  BoardTitle,
   Filters,
   FilterSelect,
   Greeting,
@@ -29,6 +28,7 @@ import {
   SummaryLabel,
   SummaryValue,
   Toolbar,
+  Welcome,
   type SummaryTone,
 } from "./styles";
 
@@ -204,14 +204,10 @@ export default function TicketBoard({ name }: TicketBoardProps) {
       <Page>
         <PageHeader>
           <div>
-            <PageTitle>
-              Support requests
-            </PageTitle>
+            <BoardTitle>Support requests</BoardTitle>
             <Intro>
               <Greeting>Hello {name}</Greeting>
-              <PageDescription>
-                Here&apos;s everything raised with the help team.
-              </PageDescription>
+              <Welcome>Here&apos;s everything raised with the help team.</Welcome>
             </Intro>
           </div>
 

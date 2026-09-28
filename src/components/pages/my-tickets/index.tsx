@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { cancelTicket, getTickets } from "@/api/tickets";
 import type { Ticket } from "@/api/tickets/types";
+import ConfirmDialog from "@/components/confirm-dialog";
 import TicketList from "@/components/ticket-list";
 import TicketPane, { useTicketPane } from "@/components/ticket-pane";
 import {
@@ -23,6 +24,8 @@ export default function MyTickets() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  const [cancelId, setCancelId] = useState<number | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -104,25 +107,26 @@ export default function MyTickets() {
     refreshTickets();
   };
 
-  const handleCancel = async (id: number) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to cancel this ticket?",
-    );
-
-    if (!confirmed) {
+  const handleCancel = async () => {
+    if (cancelId === null) {
       return;
     }
 
+    setIsCancelling(true);
+
     try {
-      const cancelledTicket = await cancelTicket(id);
+      const cancelledTicket = await cancelTicket(cancelId);
 
       setTickets((currentTickets) =>
         currentTickets.map((ticket) =>
-          ticket.id === id ? cancelledTicket : ticket,
+          ticket.id === cancelId ? cancelledTicket : ticket,
         ),
       );
+      setCancelId(null);
     } catch (error) {
       console.error("Failed to cancel ticket:", error);
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -159,7 +163,7 @@ export default function MyTickets() {
                     type="button"
                     $size="sm"
                     $variant="ghost"
-                    onClick={() => handleCancel(ticket.id)}
+                    onClick={() => setCancelId(ticket.id)}
                   >
                     Cancel
                   </Button>
@@ -169,6 +173,19 @@ export default function MyTickets() {
           />
         )}
       </Page>
+
+      <ConfirmDialog
+        open={cancelId !== null}
+        title="Cancel this ticket?"
+        description="This withdraws the request from the help team."
+        confirmLabel="Cancel ticket"
+        pendingLabel="Cancelling…"
+        cancelLabel="Keep ticket"
+        tone="danger"
+        pending={isCancelling}
+        onConfirm={handleCancel}
+        onCancel={() => setCancelId(null)}
+      />
 
       <TicketPane
         key={selectedId ?? "closed"}

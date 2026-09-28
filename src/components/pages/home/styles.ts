@@ -2,6 +2,8 @@
 
 import styled from "styled-components";
 
+import { PageDescription, PageTitle } from "@/components/ui/styles";
+
 export const Search = styled.div`
   position: relative;
   width: 100%;
@@ -33,15 +35,23 @@ export const Search = styled.div`
   }
 `;
 
+export const BoardTitle = styled(PageTitle)`
+  color: var(--color-accent);
+`;
+
 export const Intro = styled.div`
   margin-top: 6px;
 `;
 
 export const Greeting = styled.p`
-  color: var(--color-text);
+  color: var(--color-accent);
   font-size: 14px;
   font-weight: 500;
   line-height: 20px;
+`;
+
+export const Welcome = styled(PageDescription)`
+  color: var(--color-secondary);
 `;
 
 export type SummaryTone =
