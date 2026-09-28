@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { getTickets } from "@/api/tickets";
 import type { Ticket, TicketPriority, TicketStatus } from "@/api/tickets/types";
+import { getCurrentUser, type CurrentUser } from "@/api/users";
 import TicketList from "@/components/ticket-list";
 import TicketPane, { useTicketPane } from "@/components/ticket-pane";
 import {
@@ -16,15 +17,40 @@ import {
   PageTitle,
 } from "@/components/ui";
 
-import { Count, Filters, FilterSelect, Search, Toolbar } from "./styles";
+import {
+  Filters,
+  FilterSelect,
+  Greeting,
+  Intro,
+  Search,
+  Summary,
+  SummaryButton,
+  SummaryHead,
+  SummaryLabel,
+  SummaryValue,
+  Toolbar,
+  type SummaryTone,
+} from "./styles";
 
 const statusOptions: { value: TicketStatus; label: string }[] = [
   { value: "pending", label: "Pending" },
   { value: "in_review", label: "In review" },
   { value: "referred", label: "Referred" },
   { value: "resolved", label: "Resolved" },
-  { value: "closed", label: "Closed" },
   { value: "cancelled", label: "Cancelled" },
+];
+
+const summaryStatuses: {
+  value: TicketStatus;
+  label: string;
+  tone: SummaryTone;
+  quiet?: boolean;
+}[] = [
+  { value: "pending", label: "Pending", tone: "pending" },
+  { value: "in_review", label: "In review", tone: "in_review" },
+  { value: "referred", label: "Referred", tone: "referred" },
+  { value: "resolved", label: "Resolved", tone: "resolved" },
+  { value: "cancelled", label: "Cancelled", tone: "cancelled", quiet: true },
 ];
 
 const priorityOptions: { value: TicketPriority; label: string }[] = [
@@ -62,6 +88,7 @@ function SearchIcon() {
 export default function TicketBoard({ name }: TicketBoardProps) {
   const { selectedId, openTicket, closeTicket } = useTicketPane();
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<TicketStatus | "">("");
   const [priorityFilter, setPriorityFilter] = useState<TicketPriority | "">("");
@@ -73,13 +100,17 @@ export default function TicketBoard({ name }: TicketBoardProps) {
 
     const loadTickets = async () => {
       try {
-        const data = await getTickets();
+        const [data, user] = await Promise.all([
+          getTickets(),
+          getCurrentUser().catch(() => null),
+        ]);
 
         if (!active) {
           return;
         }
 
         setTickets(data);
+        setCurrentUser(user);
         setLoadError("");
       } catch (error) {
         console.error("Failed to load tickets:", error);
@@ -157,24 +188,32 @@ export default function TicketBoard({ name }: TicketBoardProps) {
     setSearchTerm("");
   };
 
+  const canViewSummary =
+    currentUser?.role === "support" || currentUser?.role === "admin";
+
+  const statusCounts = useMemo(
+    () =>
+      tickets.reduce<Partial<Record<TicketStatus, number>>>((counts, ticket) => {
+        counts[ticket.status] = (counts[ticket.status] ?? 0) + 1;
+        return counts;
+      }, {}),
+    [tickets],
+  );
+
   return (
     <>
       <Page>
         <PageHeader>
           <div>
             <PageTitle>
-              Tickets{" "}
-              {!isLoading && tickets.length > 0 && (
-                <Count>
-                  {filteredTickets.length === tickets.length
-                    ? tickets.length
-                    : `${filteredTickets.length} of ${tickets.length}`}
-                </Count>
-              )}
+              Support requests
             </PageTitle>
-            <PageDescription>
-              Hello {name}. Here&apos;s everything raised with the help team.
-            </PageDescription>
+            <Intro>
+              <Greeting>Hello {name}</Greeting>
+              <PageDescription>
+                Here&apos;s everything raised with the help team.
+              </PageDescription>
+            </Intro>
           </div>
 
           <Toolbar>
@@ -229,8 +268,8 @@ export default function TicketBoard({ name }: TicketBoardProps) {
               <SearchIcon />
               <input
                 type="search"
-                aria-label="Search tickets"
-                placeholder="Search tickets"
+                aria-label="Search support requests"
+                placeholder="Search support requests"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
               />
@@ -239,6 +278,44 @@ export default function TicketBoard({ name }: TicketBoardProps) {
         </PageHeader>
 
         {loadError && <Alert role="alert">{loadError}</Alert>}
+
+        {!isLoading && canViewSummary && tickets.length > 0 && (
+          <Summary aria-label="Support request summary">
+            {summaryStatuses.map((item) => (
+              <SummaryButton
+                key={item.value}
+                type="button"
+                $tone={item.tone}
+                $active={statusFilter === item.value}
+                aria-pressed={statusFilter === item.value}
+                onClick={() =>
+                  setStatusFilter((current) =>
+                    current === item.value ? "" : item.value,
+                  )
+                }
+              >
+                <SummaryHead $tone={item.tone}>
+                  <SummaryLabel>{item.label}</SummaryLabel>
+                </SummaryHead>
+                <SummaryValue $quiet={item.quiet}>
+                  {statusCounts[item.value] ?? 0}
+                </SummaryValue>
+              </SummaryButton>
+            ))}
+            <SummaryButton
+              type="button"
+              $tone="total"
+              $active={!statusFilter}
+              aria-pressed={!statusFilter}
+              onClick={() => setStatusFilter("")}
+            >
+              <SummaryHead $tone="total">
+                <SummaryLabel>Total</SummaryLabel>
+              </SummaryHead>
+              <SummaryValue $quiet>{tickets.length}</SummaryValue>
+            </SummaryButton>
+          </Summary>
+        )}
 
         {isLoading ? (
           <EmptyState>Loading tickets…</EmptyState>

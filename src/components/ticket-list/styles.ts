@@ -2,6 +2,17 @@
 
 import styled from "styled-components";
 
+import type { TicketStatus } from "@/api/tickets/types";
+
+const titleColors: Record<TicketStatus, string> = {
+  pending: "#3f3f46",
+  in_review: "#3d4f86",
+  referred: "#8a6233",
+  resolved: "#3d6b4e",
+  cancelled: "#a1a1aa",
+  closed: "#71717a",
+};
+
 export const List = styled.ul`
   display: flex;
   flex-direction: column;
@@ -58,10 +69,10 @@ export const OpenButton = styled.button`
   }
 `;
 
-export const Title = styled.span`
+export const Title = styled.span<{ $status: TicketStatus }>`
   display: block;
   overflow: hidden;
-  color: var(--color-text);
+  color: ${({ $status }) => titleColors[$status]};
   font-size: 15px;
   font-weight: 600;
   line-height: 22px;

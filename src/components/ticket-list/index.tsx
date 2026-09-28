@@ -39,7 +39,7 @@ export default function TicketList({
         return (
           <Row key={ticket.id}>
             <OpenButton type="button" onClick={() => onOpen(ticket.id)}>
-              <Title>{ticket.title}</Title>
+              <Title $status={ticket.status}>{ticket.title}</Title>
               {ticket.description && (
                 <Description>{ticket.description}</Description>
               )}
