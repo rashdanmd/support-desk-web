@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import styled from "styled-components";
 
 import { getTickets } from "@/api/tickets";
 import type { Ticket } from "@/api/tickets/types";
@@ -16,36 +15,11 @@ import {
   PageTitle,
 } from "@/components/ui";
 
+import { Count, Search } from "./styles";
+
 type TicketBoardProps = {
   name: string;
 };
-
-const Search = styled.div`
-  position: relative;
-  width: 100%;
-
-  @media (min-width: 768px) {
-    width: 280px;
-  }
-
-  svg {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    color: var(--color-text-faint);
-    transform: translateY(-50%);
-    pointer-events: none;
-  }
-
-  input {
-    padding-left: 34px;
-  }
-`;
-
-const Count = styled.span`
-  color: var(--color-text-faint);
-  font-weight: 400;
-`;
 
 function SearchIcon() {
   return (

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import styled from "styled-components";
 
 import {
   createTicketResponse,
@@ -11,13 +10,22 @@ import {
 } from "@/api/responses";
 import {
   Button,
-  Form,
   FormActions,
   Message,
   Section,
   SectionTitle,
 } from "@/components/ui";
 import { formatDateTime } from "@/lib/format";
+
+import {
+  Author,
+  Composer,
+  ResponseBody,
+  ResponseHeader,
+  ResponseItem,
+  ResponseList,
+  Timestamp,
+} from "./styles";
 
 type ResponseFormData = {
   message: string;
@@ -27,51 +35,6 @@ type TicketResponsesProps = {
   ticketId: number;
   canRespond: boolean;
 };
-
-const ResponseList = styled.ol`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const ResponseItem = styled.li`
-  padding: 12px 14px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-`;
-
-const ResponseHeader = styled.div`
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 4px;
-`;
-
-const Author = styled.span`
-  color: var(--color-text);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 18px;
-`;
-
-const Timestamp = styled.time`
-  color: var(--color-text-subtle);
-  font-size: 12px;
-  line-height: 16px;
-`;
-
-const ResponseBody = styled.p`
-  color: var(--color-text);
-  font-size: 14px;
-  line-height: 22px;
-  white-space: pre-wrap;
-  word-break: break-word;
-`;
-
-const Composer = styled(Form)`
-  margin-top: 8px;
-`;
 
 export default function TicketResponses({
   ticketId,

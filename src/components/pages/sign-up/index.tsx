@@ -3,21 +3,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import styled from "styled-components";
-
 import { signUpWithEmail } from "@/api/auth";
-import {
-  Alert,
-  Button,
-  CardTitle,
-  FieldError,
-  Form,
-  Notice,
-} from "@/components/ui";
+import { Alert, CardTitle, FieldError, Form, Notice } from "@/components/ui";
 
-const FullWidthButton = styled(Button)`
-  width: 100%;
-`;
+import { FullWidthButton } from "./styles";
 
 type SignUpFormData = {
   name: string;

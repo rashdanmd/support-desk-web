@@ -1,13 +1,8 @@
 "use client";
 
-import styled from "styled-components";
-
-import { Button } from "@/components/ui";
 import { createClient } from "@/lib/supabase/client";
 
-const FullWidthButton = styled(Button)`
-  width: 100%;
-`;
+import { FullWidthButton } from "./styles";
 
 export default function GoogleSignIn() {
   const handleSignIn = async () => {

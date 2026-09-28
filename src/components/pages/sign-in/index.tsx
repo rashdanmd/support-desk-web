@@ -3,38 +3,17 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import styled from "styled-components";
 
 import { signInWithEmail } from "@/api/auth";
 import GoogleSignIn from "@/components/google-sign-in";
-import { Alert, Button, CardTitle, FieldError, Form } from "@/components/ui";
+import { Alert, CardTitle, FieldError, Form } from "@/components/ui";
+
+import { Divider, FullWidthButton } from "./styles";
 
 type SignInFormData = {
   email: string;
   password: string;
 };
-
-const Divider = styled.p`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 20px 0;
-  color: var(--color-text-faint);
-  font-size: 12px;
-  line-height: 16px;
-
-  &::before,
-  &::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: var(--color-border);
-  }
-`;
-
-const FullWidthButton = styled(Button)`
-  width: 100%;
-`;
 
 export default function SignIn() {
   const router = useRouter();
