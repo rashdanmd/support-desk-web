@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import DemoSignIn from "@/components/demo-sign-in";
 import SignIn from "@/components/pages/auth/sign-in";
 import SignUp from "@/components/pages/auth/sign-up";
 import { TextButton } from "@/components/ui";
@@ -17,7 +18,11 @@ import {
   Title,
 } from "./styles";
 
-export default function Auth() {
+type AuthProps = {
+  demoUnavailable?: boolean;
+};
+
+export default function Auth({ demoUnavailable = false }: AuthProps) {
   const [isSignUp, setIsSignUp] = useState(false);
 
   return (
@@ -48,6 +53,8 @@ export default function Auth() {
             </TextButton>
           </Switch>
         )}
+
+        <DemoSignIn unavailable={demoUnavailable} />
       </Container>
     </Layout>
   );

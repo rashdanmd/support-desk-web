@@ -7,15 +7,20 @@ import { createClient } from "@/lib/supabase/server";
 
 import TicketBoard from "./ticket-board";
 
-export default async function Home() {
+type HomeProps = {
+  searchParams: Promise<{ demo?: string | string[] }>;
+};
+
+export default async function Home({ searchParams }: HomeProps) {
   const supabase = await createClient();
+  const params = await searchParams;
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return <Auth />;
+    return <Auth demoUnavailable={params.demo === "unavailable"} />;
   }
 
   const name = greetingName(user);
