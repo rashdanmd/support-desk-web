@@ -1,3 +1,5 @@
+import { displayName } from "@/lib/display-name";
+
 type GreetingUser = {
   email?: string | null;
   user_metadata?: Record<string, unknown> | null;
@@ -16,8 +18,7 @@ export const greetingName = (user: GreetingUser) => {
     firstWord(text(metadata.full_name)) ||
     firstWord(text(metadata.name));
 
-  const raw = firstName || text(user.email);
-  const name = raw.includes("@") ? (raw.split("@")[0] ?? "") : raw;
+  const name = displayName(firstName || text(user.email));
 
   return name || "there";
 };

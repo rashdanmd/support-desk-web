@@ -25,6 +25,7 @@ import {
   SectionTitle,
   StatusBadge,
 } from "@/components/ui";
+import { displayName } from "@/lib/display-name";
 import { formatDateTime } from "@/lib/format";
 import TicketResponses from "./components/ticket-responses";
 
@@ -194,7 +195,7 @@ export default function TicketDetails({
 
       <MetaList>
         <dt>Raised by</dt>
-        <dd>{ticket.creator.display_name}</dd>
+        <dd>{displayName(ticket.creator.display_name)}</dd>
         <dt>Team</dt>
         <dd>{ticket.team.name}</dd>
         <dt>Created</dt>

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import type { Ticket } from "@/api/tickets/types";
 import { PriorityBadge, StatusBadge } from "@/components/ui";
+import { displayName } from "@/lib/display-name";
 import { formatDate } from "@/lib/format";
 
 import {
@@ -45,7 +46,9 @@ export default function TicketList({
               )}
               <Meta>
                 <span>{ticket.team.name}</span>
-                {showCreator && <span>{ticket.creator.display_name}</span>}
+                {showCreator && (
+                  <span>{displayName(ticket.creator.display_name)}</span>
+                )}
                 <span>{formatDate(ticket.created_at)}</span>
               </Meta>
             </OpenButton>
