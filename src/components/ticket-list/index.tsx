@@ -15,7 +15,6 @@ import {
   Meta,
   OpenButton,
   Row,
-  TicketId,
   Title,
 } from "./styles";
 
@@ -45,7 +44,6 @@ export default function TicketList({
                 <Description>{ticket.description}</Description>
               )}
               <Meta>
-                <TicketId>#{ticket.id}</TicketId>
                 <span>{ticket.team.name}</span>
                 {showCreator && <span>{ticket.creator.display_name}</span>}
                 <span>{formatDate(ticket.created_at)}</span>

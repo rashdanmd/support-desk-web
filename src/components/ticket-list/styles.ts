@@ -3,10 +3,9 @@
 import styled from "styled-components";
 
 export const List = styled.ul`
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 export const Row = styled.li`
@@ -15,14 +14,17 @@ export const Row = styled.li`
   flex-direction: column;
   gap: 12px;
   padding: 16px 20px;
-  transition: background-color 120ms ease;
-
-  & + & {
-    border-top: 1px solid var(--color-border);
-  }
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
 
   &:hover {
-    background: var(--color-surface-muted);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-popover);
   }
 
   @media (min-width: 768px) {
@@ -93,11 +95,6 @@ export const Meta = styled.span`
     margin-right: 8px;
     color: var(--color-text-faint);
   }
-`;
-
-export const TicketId = styled.span`
-  font-family: var(--font-mono);
-  font-size: 12px;
 `;
 
 export const Aside = styled.div`
