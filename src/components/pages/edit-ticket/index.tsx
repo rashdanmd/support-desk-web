@@ -8,6 +8,22 @@ import { getTicketById, updateTicket } from "@/api/tickets";
 import { getTeams } from "@/api/teams";
 import type { Team } from "@/api/teams";
 import type { Ticket } from "@/api/tickets/types";
+import {
+  Alert,
+  Button,
+  ButtonLink,
+  CodeTextarea,
+  FieldHint,
+  FieldRow,
+  Form,
+  FormActions,
+  FormCard,
+  Message,
+  NarrowPage,
+  PageDescription,
+  PageHeader,
+  PageTitle,
+} from "@/components/ui";
 
 type EditTicketFormData = {
   title: string;
@@ -69,7 +85,11 @@ export default function EditTicket() {
   }, []);
 
   if (!ticket) {
-    return <p>Loading ticket...</p>;
+    return (
+      <NarrowPage>
+        <Message>Loading ticket…</Message>
+      </NarrowPage>
+    );
   }
 
   const onSubmit = async (data: EditTicketFormData) => {
@@ -90,61 +110,81 @@ export default function EditTicket() {
   };
 
   return (
-    <main>
-      <h1>Edit ticket</h1>
-
-      {updateError && <p role="alert">{updateError}</p>}
-
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <NarrowPage>
+      <PageHeader>
         <div>
-          <label htmlFor="title">Title</label>
-          <input id="title" type="text" {...register("title")} />
+          <PageTitle>Edit ticket</PageTitle>
+          <PageDescription>
+            #{ticket.id} · {ticket.title}
+          </PageDescription>
         </div>
+      </PageHeader>
 
-        <div>
-          <label htmlFor="description">Description</label>
-          <textarea id="description" {...register("description")} />
-        </div>
+      {updateError && <Alert role="alert">{updateError}</Alert>}
 
-        <div>
-          <label htmlFor="teamId">Team</label>
+      <FormCard>
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <div>
+            <label htmlFor="title">Title</label>
+            <input id="title" type="text" {...register("title")} />
+          </div>
 
-          <select
-            id="teamId"
-            {...register("teamId", {
-              valueAsNumber: true,
-            })}
-          >
-            {teams.map((team) => (
-              <option key={team.id} value={team.id}>
-                {team.name}
-              </option>
-            ))}
-          </select>
-        </div>
+          <FieldRow>
+            <div>
+              <label htmlFor="teamId">Team</label>
 
-        <div>
-          <label htmlFor="affectedUrl">Affected URL</label>
-          <input id="affectedUrl" type="text" {...register("affectedUrl")} />
-        </div>
+              <select
+                id="teamId"
+                {...register("teamId", {
+                  valueAsNumber: true,
+                })}
+              >
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <div>
-          <label htmlFor="curl">cURL</label>
-          <textarea id="curl" {...register("curl")} />
-        </div>
+            <div>
+              <label htmlFor="priority">Priority</label>
+              <select id="priority" {...register("priority")}>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+          </FieldRow>
 
-        <div>
-          <label htmlFor="priority">Priority</label>
-          <select id="priority" {...register("priority")}>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
-          </select>
-        </div>
+          <div>
+            <label htmlFor="description">Description</label>
+            <textarea id="description" {...register("description")} />
+          </div>
 
-        <button type="submit">Save changes</button>
-      </form>
-    </main>
+          <div>
+            <label htmlFor="affectedUrl">
+              Affected URL<FieldHint>Optional</FieldHint>
+            </label>
+            <input id="affectedUrl" type="text" {...register("affectedUrl")} />
+          </div>
+
+          <div>
+            <label htmlFor="curl">
+              cURL<FieldHint>Optional</FieldHint>
+            </label>
+            <CodeTextarea id="curl" {...register("curl")} />
+          </div>
+
+          <FormActions>
+            <ButtonLink href="/my-tickets">Cancel</ButtonLink>
+            <Button type="submit" $variant="primary">
+              Save changes
+            </Button>
+          </FormActions>
+        </Form>
+      </FormCard>
+    </NarrowPage>
   );
 }

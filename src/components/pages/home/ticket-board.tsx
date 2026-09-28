@@ -5,84 +5,68 @@ import styled from "styled-components";
 
 import { getTickets } from "@/api/tickets";
 import type { Ticket } from "@/api/tickets/types";
+import TicketList from "@/components/ticket-list";
 import TicketPane, { useTicketPane } from "@/components/ticket-pane";
+import {
+  Alert,
+  EmptyState,
+  Page,
+  PageDescription,
+  PageHeader,
+  PageTitle,
+} from "@/components/ui";
 
 type TicketBoardProps = {
   name: string;
 };
 
-const Board = styled.main`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const Greeting = styled.h1`
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 32px;
-`;
-
-const SearchInput = styled.input`
+const Search = styled.div`
+  position: relative;
   width: 100%;
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid color-mix(in srgb, var(--foreground) 24%, transparent);
-  border-radius: 8px;
-  background: var(--background);
-  color: inherit;
-  font-size: 16px;
-  line-height: 24px;
-`;
 
-const TicketList = styled.ul`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
+  @media (min-width: 768px) {
+    width: 280px;
+  }
 
-const TicketCard = styled.button`
-  width: 100%;
-  padding: 16px;
-  border: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
-  border-radius: 8px;
-  background: var(--background);
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
+  svg {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    color: var(--color-text-faint);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
 
-  &:hover {
-    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  input {
+    padding-left: 34px;
   }
 `;
 
-const TicketTitle = styled.p`
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 22px;
+const Count = styled.span`
+  color: var(--color-text-faint);
+  font-weight: 400;
 `;
 
-const TicketDescription = styled.p`
-  margin-top: 8px;
-  font-size: 14px;
-  line-height: 20px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const TicketMeta = styled.p`
-  margin-top: 8px;
-  font-size: 13px;
-  line-height: 18px;
-`;
-
-const Message = styled.p`
-  font-size: 14px;
-  line-height: 20px;
-`;
+function SearchIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+      <circle
+        cx="7"
+        cy="7"
+        r="4.75"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M10.5 10.5 14 14"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 export default function TicketBoard({ name }: TicketBoardProps) {
   const { selectedId, openTicket, closeTicket } = useTicketPane();
@@ -158,45 +142,44 @@ export default function TicketBoard({ name }: TicketBoardProps) {
 
   return (
     <>
-      <Board>
-        <Greeting>Hello {name}</Greeting>
+      <Page>
+        <PageHeader>
+          <div>
+            <PageTitle>
+              Tickets{" "}
+              {!isLoading && tickets.length > 0 && (
+                <Count>{tickets.length}</Count>
+              )}
+            </PageTitle>
+            <PageDescription>
+              Hello {name}. Here&apos;s everything raised with the help team.
+            </PageDescription>
+          </div>
 
-        <SearchInput
-          type="search"
-          aria-label="Search tickets"
-          placeholder="Search tickets"
-          value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
-        />
+          <Search>
+            <SearchIcon />
+            <input
+              type="search"
+              aria-label="Search tickets"
+              placeholder="Search tickets"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+            />
+          </Search>
+        </PageHeader>
 
-        {loadError && <Message role="alert">{loadError}</Message>}
+        {loadError && <Alert role="alert">{loadError}</Alert>}
 
         {isLoading ? (
-          <Message>Loading tickets...</Message>
+          <EmptyState>Loading tickets…</EmptyState>
         ) : filteredTickets.length === 0 ? (
-          <Message>
+          <EmptyState>
             {searchTerm ? "No tickets match your search." : "No tickets yet."}
-          </Message>
+          </EmptyState>
         ) : (
-          <TicketList>
-            {filteredTickets.map((ticket) => (
-              <li key={ticket.id}>
-                <TicketCard
-                  type="button"
-                  onClick={() => openTicket(ticket.id)}
-                >
-                  <TicketTitle>{ticket.title}</TicketTitle>
-                  <TicketDescription>{ticket.description}</TicketDescription>
-                  <TicketMeta>Raised by: {ticket.creator.display_name}</TicketMeta>
-                  <TicketMeta>Team: {ticket.team.name}</TicketMeta>
-                  <TicketMeta>Status: {ticket.status}</TicketMeta>
-                  <TicketMeta>Priority: {ticket.priority}</TicketMeta>
-                </TicketCard>
-              </li>
-            ))}
-          </TicketList>
+          <TicketList tickets={filteredTickets} onOpen={openTicket} />
         )}
-      </Board>
+      </Page>
 
       <TicketPane
         key={selectedId ?? "closed"}

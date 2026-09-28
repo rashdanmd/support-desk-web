@@ -2,6 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { getTeams, type Team } from "@/api/teams";
+import {
+  Button,
+  ButtonLink,
+  CodeTextarea,
+  FieldHint,
+  FieldRow,
+  Form,
+  FormActions,
+  FormCard,
+  NarrowPage,
+  PageDescription,
+  PageHeader,
+  PageTitle,
+} from "@/components/ui";
 import { handleSubmit } from "./handlers";
 
 export default function CreateTicket() {
@@ -21,56 +35,93 @@ export default function CreateTicket() {
   }, []);
 
   return (
-    <main>
-      <h1>Create a support request</h1>
-
-      <form onSubmit={handleSubmit}>
+    <NarrowPage>
+      <PageHeader>
         <div>
-          <label htmlFor="title">Title</label>
-          <input id="title" name="title" type="text" />
+          <PageTitle>Create a support request</PageTitle>
+          <PageDescription>
+            Describe the issue and the help team will pick it up.
+          </PageDescription>
         </div>
+      </PageHeader>
 
-        <div>
-          <label htmlFor="team">Team</label>
+      <FormCard>
+        <Form onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="title">Title</label>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              placeholder="Short summary of the issue"
+            />
+          </div>
 
-          <select id="team" name="team">
-            <option value="">Select a team</option>
+          <FieldRow>
+            <div>
+              <label htmlFor="team">Team</label>
 
-            {teams.map((team) => (
-              <option key={team.id} value={team.id}>
-                {team.name}
-              </option>
-            ))}
-          </select>
-        </div>
+              <select id="team" name="team">
+                <option value="">Select a team</option>
 
-        <div>
-          <label htmlFor="description">Description</label>
-          <textarea id="description" name="description" />
-        </div>
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <div>
-          <label htmlFor="affectedUrl">Affected URL</label>
-          <input id="affectedUrl" name="affectedUrl" />
-        </div>
+            <div>
+              <label htmlFor="priority">Priority</label>
+              <select id="priority" name="priority" defaultValue="medium">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+          </FieldRow>
 
-        <div>
-          <label htmlFor="curl">cURL</label>
-          <textarea id="curl" name="curl" />
-        </div>
+          <div>
+            <label htmlFor="description">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              placeholder="What happened, and what did you expect to happen?"
+            />
+          </div>
 
-        <div>
-          <label htmlFor="priority">Priority</label>
-          <select id="priority" name="priority" defaultValue="medium">
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
-          </select>
-        </div>
+          <div>
+            <label htmlFor="affectedUrl">
+              Affected URL<FieldHint>Optional</FieldHint>
+            </label>
+            <input
+              id="affectedUrl"
+              name="affectedUrl"
+              placeholder="https://"
+            />
+          </div>
 
-        <button type="submit">Create ticket</button>
-      </form>
-    </main>
+          <div>
+            <label htmlFor="curl">
+              cURL<FieldHint>Optional</FieldHint>
+            </label>
+            <CodeTextarea
+              id="curl"
+              name="curl"
+              placeholder="curl https://…"
+            />
+          </div>
+
+          <FormActions>
+            <ButtonLink href="/">Cancel</ButtonLink>
+            <Button type="submit" $variant="primary">
+              Create ticket
+            </Button>
+          </FormActions>
+        </Form>
+      </FormCard>
+    </NarrowPage>
   );
 }

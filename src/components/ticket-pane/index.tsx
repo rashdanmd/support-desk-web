@@ -21,7 +21,7 @@ const Backdrop = styled.button<{ $closing: boolean }>`
   z-index: 20;
   border: 0;
   padding: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(24, 24, 27, 0.24);
   opacity: ${({ $closing }) => ($closing ? 0 : 1)};
   animation: ${({ $closing }) => ($closing ? "none" : "fade-in 240ms ease")};
   transition: ${({ $closing }) => ($closing ? "opacity 240ms ease" : "none")};
@@ -46,9 +46,10 @@ const Panel = styled.aside<{ $closing: boolean }>`
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background: var(--background);
-  color: var(--foreground);
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-left: 1px solid var(--color-border);
+  box-shadow: var(--shadow-popover);
   transform: translateX(${({ $closing }) => ($closing ? "100%" : "0")});
   animation: ${({ $closing }) => ($closing ? "none" : "slide-in 240ms ease")};
   transition: ${({ $closing }) =>
@@ -65,36 +66,64 @@ const Panel = styled.aside<{ $closing: boolean }>`
   }
 
   @media (min-width: 768px) {
-    width: 480px;
+    width: 560px;
   }
 `;
 
 const PanelHeader = styled.div`
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   flex-shrink: 0;
-  padding: 12px 16px;
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--foreground) 16%, transparent);
+  height: 56px;
+  padding: 0 16px 0 24px;
+  border-bottom: 1px solid var(--color-border);
+`;
+
+const PanelTitle = styled.p`
+  color: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 18px;
 `;
 
 const CloseButton = styled.button`
-  min-height: 40px;
-  padding: 8px 16px;
-  border: 1px solid color-mix(in srgb, var(--foreground) 24%, transparent);
-  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-md);
   background: transparent;
-  color: inherit;
-  font-size: 14px;
-  line-height: 20px;
-  cursor: pointer;
+  color: var(--color-text-subtle);
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+
+  &:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+  }
 `;
 
 const PanelBody = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 24px;
 `;
+
+function CloseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M4 4l8 8M12 4l-8 8"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 type TicketPaneProps = {
   ticketId: number | null;
@@ -193,8 +222,14 @@ export default function TicketPane({ ticketId, onClose }: TicketPaneProps) {
         onTransitionEnd={handleTransitionEnd}
       >
         <PanelHeader>
-          <CloseButton ref={closeButtonRef} type="button" onClick={requestClose}>
-            Close
+          <PanelTitle>Ticket #{ticketId}</PanelTitle>
+          <CloseButton
+            ref={closeButtonRef}
+            type="button"
+            aria-label="Close"
+            onClick={requestClose}
+          >
+            <CloseIcon />
           </CloseButton>
         </PanelHeader>
         <PanelBody>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 
@@ -15,6 +14,18 @@ import {
 } from "@/api/tickets";
 import type { Ticket } from "@/api/tickets/types";
 import { getCurrentUser, type CurrentUser } from "@/api/users";
+import {
+  Button,
+  ButtonLink,
+  Form,
+  FormActions,
+  Message,
+  PriorityBadge,
+  Section,
+  SectionTitle,
+  StatusBadge,
+} from "@/components/ui";
+import { formatDateTime } from "@/lib/format";
 import TicketResponses from "./components/ticket-responses";
 
 type ReferralFormData = {
@@ -33,76 +44,102 @@ type TicketDetailsProps = {
 const Details = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 28px;
+`;
 
-  h1 {
-    font-size: 22px;
-    font-weight: 700;
-    line-height: 28px;
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const Title = styled.h1`
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+`;
+
+const Badges = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+`;
+
+const MetaList = styled.dl`
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 8px 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+  line-height: 18px;
+
+  dt {
+    color: var(--color-text-subtle);
   }
+
+  dd {
+    color: var(--color-text);
+  }
+`;
+
+const Body = styled.p`
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 22px;
+  white-space: pre-wrap;
+  word-break: break-word;
+`;
+
+const Mono = styled.p`
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 20px;
+  word-break: break-all;
+`;
+
+const Code = styled.pre`
+  padding: 12px 14px;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 18px;
+  white-space: pre-wrap;
+  word-break: break-word;
+`;
+
+const Callout = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  background: #f0fdf4;
 
   h2 {
-    margin-top: 8px;
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 22px;
+    color: #15803d;
   }
+`;
 
-  p,
-  label {
-    font-size: 14px;
-    line-height: 20px;
-  }
+const Actions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+`;
 
-  input,
-  textarea,
-  select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid color-mix(in srgb, var(--foreground) 24%, transparent);
-    border-radius: 8px;
-    background: var(--background);
-    color: inherit;
-    font-size: 16px;
-    line-height: 24px;
-  }
-
-  textarea {
-    min-height: 96px;
-  }
-
-  a,
-  button {
-    width: fit-content;
-    min-height: 40px;
-    padding: 8px 16px;
-    border: 1px solid color-mix(in srgb, var(--foreground) 24%, transparent);
-    border-radius: 8px;
-    background: var(--foreground);
-    color: var(--background);
-    font-size: 14px;
-    line-height: 20px;
-    cursor: pointer;
-  }
-
-  a {
-    display: inline-flex;
-    align-items: center;
-  }
-
-  pre {
-    font-size: 13px;
-    line-height: 18px;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
+const Panel = styled.div`
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-muted);
 `;
 
 export default function TicketDetails({
@@ -136,7 +173,7 @@ export default function TicketDetails({
   }, [ticketId]);
 
   if (!ticket) {
-    return <p>Loading ticket...</p>;
+    return <Message>Loading ticket…</Message>;
   }
 
   const handleDelete = async () => {
@@ -237,85 +274,122 @@ export default function TicketDetails({
 
   return (
     <Details>
-      <h1>{ticket.title}</h1>
+      <Header>
+        <Title>{ticket.title}</Title>
+        <Badges>
+          <StatusBadge status={ticket.status} />
+          <PriorityBadge priority={ticket.priority} />
+        </Badges>
+      </Header>
 
-      <p>Raised by: {ticket.creator.display_name}</p>
-      <p>Team: {ticket.team.name}</p>
+      <MetaList>
+        <dt>Raised by</dt>
+        <dd>{ticket.creator.display_name}</dd>
+        <dt>Team</dt>
+        <dd>{ticket.team.name}</dd>
+        <dt>Created</dt>
+        <dd>{formatDateTime(ticket.created_at)}</dd>
+        {ticket.updated_at !== ticket.created_at && (
+          <>
+            <dt>Updated</dt>
+            <dd>{formatDateTime(ticket.updated_at)}</dd>
+          </>
+        )}
+      </MetaList>
+
+      {(canManage || canStartReview || canDelete) && (
+        <Actions>
+          {canStartReview && (
+            <Button type="button" $variant="primary" onClick={handleStartReview}>
+              Start review
+            </Button>
+          )}
+          {canManage && (
+            <>
+              <ButtonLink href={`/tickets/${ticket.id}/edit`}>
+                Edit ticket
+              </ButtonLink>
+              <Button type="button" onClick={handleCancel}>
+                Cancel ticket
+              </Button>
+            </>
+          )}
+          {canDelete && (
+            <Button type="button" $variant="danger" onClick={handleDelete}>
+              Delete
+            </Button>
+          )}
+        </Actions>
+      )}
+
       {ticket.resolution && (
-        <div>
-          <h2>Resolution</h2>
-          <p>{ticket.resolution}</p>
-        </div>
+        <Callout>
+          <SectionTitle>Resolution</SectionTitle>
+          <Body>{ticket.resolution}</Body>
+        </Callout>
       )}
-      <p>Status: {ticket.status}</p>
-      <p>Priority: {ticket.priority}</p>
-      <h2>Description</h2>
-      <p>{ticket.description}</p>
+
+      <Section>
+        <SectionTitle>Description</SectionTitle>
+        <Body>{ticket.description}</Body>
+      </Section>
+
       {ticket.affected_url && (
-        <>
-          <h2>Affected URL</h2>
-          <p>{ticket.affected_url}</p>
-        </>
+        <Section>
+          <SectionTitle>Affected URL</SectionTitle>
+          <Mono>{ticket.affected_url}</Mono>
+        </Section>
       )}
+
       {ticket.curl && (
-        <>
-          <h2>cURL</h2>
-          <pre>{ticket.curl}</pre>
-        </>
-      )}
-      {canManage && (
-        <>
-          <Link href={`/tickets/${ticket.id}/edit`}>Edit ticket</Link>
-
-          <button type="button" onClick={handleCancel}>
-            Cancel ticket
-          </button>
-        </>
-      )}
-      {canStartReview && (
-        <button type="button" onClick={handleStartReview}>
-          Start review
-        </button>
+        <Section>
+          <SectionTitle>cURL</SectionTitle>
+          <Code>{ticket.curl}</Code>
+        </Section>
       )}
 
       {canRefer && (
-        <form onSubmit={handleSubmit(handleRefer)}>
-          <div>
-            <label htmlFor="referral-message">Referral message</label>
+        <Panel>
+          <Form onSubmit={handleSubmit(handleRefer)}>
+            <div>
+              <label htmlFor="referral-message">Refer ticket</label>
+              <textarea
+                id="referral-message"
+                placeholder="Explain why this ticket is being referred"
+                {...register("message", {
+                  required: true,
+                })}
+              />
+            </div>
 
-            <textarea
-              id="referral-message"
-              {...register("message", {
-                required: true,
-              })}
-            />
-          </div>
-
-          <button type="submit">Refer ticket</button>
-        </form>
+            <FormActions>
+              <Button type="submit">Refer ticket</Button>
+            </FormActions>
+          </Form>
+        </Panel>
       )}
 
       {canRefer && (
-        <form onSubmit={handleResolutionSubmit(handleResolve)}>
-          <div>
-            <label htmlFor="resolution">Resolution</label>
+        <Panel>
+          <Form onSubmit={handleResolutionSubmit(handleResolve)}>
+            <div>
+              <label htmlFor="resolution">Resolve ticket</label>
+              <textarea
+                id="resolution"
+                placeholder="Describe how the issue was resolved"
+                {...registerResolution("resolution", {
+                  required: true,
+                })}
+              />
+            </div>
 
-            <textarea
-              id="resolution"
-              {...registerResolution("resolution", {
-                required: true,
-              })}
-            />
-          </div>
-
-          <button type="submit">Resolve ticket</button>
-        </form>
-      )}
-
-      {canDelete && (
-        <button type="button" onClick={handleDelete}>
-          Delete ticket
-        </button>
+            <FormActions>
+              <Button type="submit" $variant="primary">
+                Resolve ticket
+              </Button>
+            </FormActions>
+          </Form>
+        </Panel>
       )}
 
       <TicketResponses

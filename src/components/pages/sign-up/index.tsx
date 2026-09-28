@@ -3,7 +3,21 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import styled from "styled-components";
+
 import { signUpWithEmail } from "@/api/auth";
+import {
+  Alert,
+  Button,
+  CardTitle,
+  FieldError,
+  Form,
+  Notice,
+} from "@/components/ui";
+
+const FullWidthButton = styled(Button)`
+  width: 100%;
+`;
 
 type SignUpFormData = {
   name: string;
@@ -41,20 +55,24 @@ export default function SignUp() {
   };
 
   return (
-    <main>
-      <h1>Create an account</h1>
+    <>
+      <CardTitle>Create an account</CardTitle>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        {message && <Notice>{message}</Notice>}
+        {signUpError && <Alert role="alert">{signUpError}</Alert>}
+
         <div>
           <label htmlFor="name">Name</label>
           <input
             id="name"
             type="text"
+            autoComplete="name"
             {...register("name", {
               required: "Name is required",
             })}
           />
-          {errors.name && <p>{errors.name.message}</p>}
+          {errors.name && <FieldError>{errors.name.message}</FieldError>}
         </div>
 
         <div>
@@ -62,11 +80,13 @@ export default function SignUp() {
           <input
             id="email"
             type="email"
+            autoComplete="email"
+            placeholder="you@company.com"
             {...register("email", {
               required: "Email is required",
             })}
           />
-          {errors.email && <p>{errors.email.message}</p>}
+          {errors.email && <FieldError>{errors.email.message}</FieldError>}
         </div>
 
         <div>
@@ -74,6 +94,7 @@ export default function SignUp() {
           <input
             id="password"
             type="password"
+            autoComplete="new-password"
             {...register("password", {
               required: "Password is required",
               minLength: {
@@ -82,7 +103,9 @@ export default function SignUp() {
               },
             })}
           />
-          {errors.password && <p>{errors.password.message}</p>}
+          {errors.password && (
+            <FieldError>{errors.password.message}</FieldError>
+          )}
         </div>
 
         <div>
@@ -90,6 +113,7 @@ export default function SignUp() {
           <input
             id="confirmPassword"
             type="password"
+            autoComplete="new-password"
             {...register("confirmPassword", {
               required: "Please confirm your password",
               validate: (value) =>
@@ -97,16 +121,15 @@ export default function SignUp() {
             })}
           />
 
-          {errors.confirmPassword && <p>{errors.confirmPassword.message}</p>}
+          {errors.confirmPassword && (
+            <FieldError>{errors.confirmPassword.message}</FieldError>
+          )}
         </div>
 
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating account..." : "Create account"}
-        </button>
-      </form>
-
-      {message && <p>{message}</p>}
-      {signUpError && <p role="alert">{signUpError}</p>}
-    </main>
+        <FullWidthButton type="submit" $variant="primary" disabled={isSubmitting}>
+          {isSubmitting ? "Creating account…" : "Create account"}
+        </FullWidthButton>
+      </Form>
+    </>
   );
 }

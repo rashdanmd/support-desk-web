@@ -2,12 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import styled from "styled-components";
 
 import {
   createTicketResponse,
   getTicketResponses,
   type TicketResponse,
 } from "@/api/responses";
+import {
+  Button,
+  Form,
+  FormActions,
+  Message,
+  Section,
+  SectionTitle,
+} from "@/components/ui";
+import { formatDateTime } from "@/lib/format";
 
 type ResponseFormData = {
   message: string;
@@ -17,6 +27,51 @@ type TicketResponsesProps = {
   ticketId: number;
   canRespond: boolean;
 };
+
+const ResponseList = styled.ol`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const ResponseItem = styled.li`
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+`;
+
+const ResponseHeader = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+`;
+
+const Author = styled.span`
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+`;
+
+const Timestamp = styled.time`
+  color: var(--color-text-subtle);
+  font-size: 12px;
+  line-height: 16px;
+`;
+
+const ResponseBody = styled.p`
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 22px;
+  white-space: pre-wrap;
+  word-break: break-word;
+`;
+
+const Composer = styled(Form)`
+  margin-top: 8px;
+`;
 
 export default function TicketResponses({
   ticketId,
@@ -53,39 +108,47 @@ export default function TicketResponses({
   };
 
   return (
-    <section>
-      <h2>Responses</h2>
+    <Section>
+      <SectionTitle>Responses</SectionTitle>
 
       {responses.length === 0 ? (
-        <p>No responses yet.</p>
+        <Message>No responses yet.</Message>
       ) : (
-        responses.map((response) => (
-          <div key={response.id}>
-            <p>
-              <strong>{response.author.display_name}</strong>
-            </p>
-
-            <p>{response.message}</p>
-          </div>
-        ))
+        <ResponseList>
+          {responses.map((response) => (
+            <ResponseItem key={response.id}>
+              <ResponseHeader>
+                <Author>{response.author.display_name}</Author>
+                <Timestamp dateTime={response.created_at}>
+                  {formatDateTime(response.created_at)}
+                </Timestamp>
+              </ResponseHeader>
+              <ResponseBody>{response.message}</ResponseBody>
+            </ResponseItem>
+          ))}
+        </ResponseList>
       )}
 
       {canRespond && (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <Composer onSubmit={handleSubmit(onSubmit)}>
           <div>
             <label htmlFor="message">Add response</label>
-
             <textarea
               id="message"
+              placeholder="Write a reply"
               {...register("message", {
                 required: true,
               })}
             />
           </div>
 
-          <button type="submit">Send response</button>
-        </form>
+          <FormActions>
+            <Button type="submit" $variant="primary">
+              Send response
+            </Button>
+          </FormActions>
+        </Composer>
       )}
-    </section>
+    </Section>
   );
 }

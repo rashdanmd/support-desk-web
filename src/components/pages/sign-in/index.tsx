@@ -3,14 +3,38 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import styled from "styled-components";
 
 import { signInWithEmail } from "@/api/auth";
 import GoogleSignIn from "@/components/google-sign-in";
+import { Alert, Button, CardTitle, FieldError, Form } from "@/components/ui";
 
 type SignInFormData = {
   email: string;
   password: string;
 };
+
+const Divider = styled.p`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--color-text-faint);
+  font-size: 12px;
+  line-height: 16px;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+  }
+`;
+
+const FullWidthButton = styled(Button)`
+  width: 100%;
+`;
 
 export default function SignIn() {
   const router = useRouter();
@@ -38,21 +62,25 @@ export default function SignIn() {
 
   return (
     <>
-      <h2>Sign in</h2>
+      <CardTitle>Sign in</CardTitle>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        {signInError && <Alert role="alert">{signInError}</Alert>}
+
         <div>
           <label htmlFor="email">Email</label>
 
           <input
             id="email"
             type="email"
+            autoComplete="email"
+            placeholder="you@company.com"
             {...register("email", {
               required: "Email is required",
             })}
           />
 
-          {errors.email && <p>{errors.email.message}</p>}
+          {errors.email && <FieldError>{errors.email.message}</FieldError>}
         </div>
 
         <div>
@@ -61,22 +89,23 @@ export default function SignIn() {
           <input
             id="password"
             type="password"
+            autoComplete="current-password"
             {...register("password", {
               required: "Password is required",
             })}
           />
 
-          {errors.password && <p>{errors.password.message}</p>}
+          {errors.password && (
+            <FieldError>{errors.password.message}</FieldError>
+          )}
         </div>
 
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Signing in..." : "Sign in"}
-        </button>
-      </form>
+        <FullWidthButton type="submit" $variant="primary" disabled={isSubmitting}>
+          {isSubmitting ? "Signing in…" : "Sign in"}
+        </FullWidthButton>
+      </Form>
 
-      {signInError && <p role="alert">{signInError}</p>}
-
-      <p>or</p>
+      <Divider>or</Divider>
 
       <GoogleSignIn />
     </>
