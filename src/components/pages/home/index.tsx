@@ -1,6 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
-import SignOut from "@/components/sign-out";
+import { Suspense } from "react";
+
+import AppShell from "@/components/app-shell";
 import Auth from "@/components/pages/auth";
+import { createClient } from "@/lib/supabase/server";
+
+import TicketBoard from "./ticket-board";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -9,21 +13,17 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    return <Auth />;
+  }
+
+  const name = user.user_metadata.full_name ?? user.email ?? "there";
+
   return (
-    <main>
-      {user ? (
-        <>
-          <h1>Support Desk</h1>
-
-          <p>Welcome, {user.user_metadata.full_name ?? user.email}</p>
-
-          <p>You are logged in.</p>
-
-          <SignOut />
-        </>
-      ) : (
-        <Auth />
-      )}
-    </main>
+    <AppShell>
+      <Suspense fallback={<p>Loading tickets...</p>}>
+        <TicketBoard name={name} />
+      </Suspense>
+    </AppShell>
   );
 }

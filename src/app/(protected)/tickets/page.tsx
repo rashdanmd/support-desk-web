@@ -1,1 +1,5 @@
-export { default } from "@components/pages/tickets";
+import { redirect } from "next/navigation";
+
+export default function TicketsPage() {
+  redirect("/");
+}

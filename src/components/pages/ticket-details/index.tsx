@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import styled from "styled-components";
 
 import {
   cancelTicket,
@@ -24,9 +24,91 @@ type ReferralFormData = {
 type ResolutionFormData = {
   resolution: string;
 };
-export default function TicketDetails() {
-  const router = useRouter();
-  const params = useParams<{ id: string }>();
+
+type TicketDetailsProps = {
+  ticketId: number;
+  onClose: () => void;
+};
+
+const Details = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 28px;
+  }
+
+  h2 {
+    margin-top: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+  }
+
+  p,
+  label {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  input,
+  textarea,
+  select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid color-mix(in srgb, var(--foreground) 24%, transparent);
+    border-radius: 8px;
+    background: var(--background);
+    color: inherit;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  textarea {
+    min-height: 96px;
+  }
+
+  a,
+  button {
+    width: fit-content;
+    min-height: 40px;
+    padding: 8px 16px;
+    border: 1px solid color-mix(in srgb, var(--foreground) 24%, transparent);
+    border-radius: 8px;
+    background: var(--foreground);
+    color: var(--background);
+    font-size: 14px;
+    line-height: 20px;
+    cursor: pointer;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  pre {
+    font-size: 13px;
+    line-height: 18px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+`;
+
+export default function TicketDetails({
+  ticketId,
+  onClose,
+}: TicketDetailsProps) {
   const { register, handleSubmit, reset } = useForm<ReferralFormData>();
   const {
     register: registerResolution,
@@ -39,17 +121,11 @@ export default function TicketDetails() {
 
   useEffect(() => {
     const loadTicket = async () => {
-      const id = Number(params.id);
-
-      if (Number.isNaN(id)) {
-        return;
-      }
-
       try {
         const user = await getCurrentUser();
         setCurrentUser(user);
 
-        const data = await getTicketById(id);
+        const data = await getTicketById(ticketId);
         setTicket(data);
       } catch (error) {
         console.error("Failed to load ticket:", error);
@@ -57,7 +133,7 @@ export default function TicketDetails() {
     };
 
     loadTicket();
-  }, [params.id]);
+  }, [ticketId]);
 
   if (!ticket) {
     return <p>Loading ticket...</p>;
@@ -78,7 +154,7 @@ export default function TicketDetails() {
 
     try {
       await deleteTicket(ticket.id);
-      router.push("/tickets");
+      onClose();
     } catch (error) {
       console.error("Failed to delete ticket:", error);
     }
@@ -160,7 +236,7 @@ export default function TicketDetails() {
   };
 
   return (
-    <main>
+    <Details>
       <h1>{ticket.title}</h1>
 
       <p>Raised by: {ticket.creator.display_name}</p>
@@ -250,6 +326,6 @@ export default function TicketDetails() {
           currentUser?.role === "admin"
         }
       />
-    </main>
+    </Details>
   );
 }

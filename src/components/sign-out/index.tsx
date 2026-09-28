@@ -21,7 +21,7 @@ export default function SignOut() {
   };
 
   return (
-    <button type="button" onClick={handleSignOut}>
+    <button type="button" role="menuitem" onClick={handleSignOut}>
       Sign out
     </button>
   );

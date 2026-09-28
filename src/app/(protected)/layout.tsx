@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import AppShell from "@/components/app-shell";
 import { createClient } from "@/lib/supabase/server";
 
 type ProtectedLayoutProps = {
@@ -19,5 +20,5 @@ export default async function ProtectedLayout({
     redirect("/");
   }
 
-  return children;
+  return <AppShell>{children}</AppShell>;
 }
