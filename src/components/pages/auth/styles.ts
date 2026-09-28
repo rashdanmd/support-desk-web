@@ -35,7 +35,7 @@ export const BrandMark = styled.span`
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
-  background: var(--color-accent);
+  background: var(--accent-gradient);
   color: var(--color-accent-text);
   font-size: 16px;
   font-weight: 700;

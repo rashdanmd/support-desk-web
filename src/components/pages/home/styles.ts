@@ -154,9 +154,9 @@ export const SummaryHead = styled.span<{ $tone: SummaryTone }>`
   }
 `;
 
-export const SummaryValue = styled.span<{ $quiet?: boolean }>`
-  font-size: ${({ $quiet }) => ($quiet ? "20px" : "26px")};
-  font-weight: ${({ $quiet }) => ($quiet ? "500" : "600")};
+export const SummaryValue = styled.span`
+  font-size: 26px;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
@@ -204,7 +204,7 @@ export const FilterSelect = styled.select`
   height: 30px;
   padding: 0 28px 0 10px;
   border: 1px solid var(--color-border);
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   background-color: transparent;
   background-image: ${chevron("#71717a")};
   background-repeat: no-repeat;
@@ -230,7 +230,7 @@ export const FilterSelect = styled.select`
   &[data-active="true"] {
     border-color: transparent;
     background-color: var(--color-accent-subtle);
-    background-image: ${chevron("#4f46e5")};
+    background-image: ${chevron("#3f608a")};
     color: var(--color-accent);
   }
 `;

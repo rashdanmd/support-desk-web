@@ -44,13 +44,12 @@ const summaryStatuses: {
   value: TicketStatus;
   label: string;
   tone: SummaryTone;
-  quiet?: boolean;
 }[] = [
   { value: "pending", label: "Pending", tone: "pending" },
   { value: "in_review", label: "In review", tone: "in_review" },
   { value: "referred", label: "Referred", tone: "referred" },
   { value: "resolved", label: "Resolved", tone: "resolved" },
-  { value: "cancelled", label: "Cancelled", tone: "cancelled", quiet: true },
+  { value: "cancelled", label: "Cancelled", tone: "cancelled" },
 ];
 
 const priorityOptions: { value: TicketPriority; label: string }[] = [
@@ -297,9 +296,7 @@ export default function TicketBoard({ name }: TicketBoardProps) {
                 <SummaryHead $tone={item.tone}>
                   <SummaryLabel>{item.label}</SummaryLabel>
                 </SummaryHead>
-                <SummaryValue $quiet={item.quiet}>
-                  {statusCounts[item.value] ?? 0}
-                </SummaryValue>
+                <SummaryValue>{statusCounts[item.value] ?? 0}</SummaryValue>
               </SummaryButton>
             ))}
             <SummaryButton
@@ -312,7 +309,7 @@ export default function TicketBoard({ name }: TicketBoardProps) {
               <SummaryHead $tone="total">
                 <SummaryLabel>Total</SummaryLabel>
               </SummaryHead>
-              <SummaryValue $quiet>{tickets.length}</SummaryValue>
+              <SummaryValue>{tickets.length}</SummaryValue>
             </SummaryButton>
           </Summary>
         )}

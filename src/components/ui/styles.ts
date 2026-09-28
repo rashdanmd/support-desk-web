@@ -14,12 +14,12 @@ type ButtonStyleProps = {
 const buttonVariants: Record<ButtonVariant, ReturnType<typeof css>> = {
   primary: css`
     border-color: var(--color-accent);
-    background: var(--color-accent);
+    background: var(--accent-gradient);
     color: var(--color-accent-text);
 
     &:hover:not(:disabled) {
       border-color: var(--color-accent-hover);
-      background: var(--color-accent-hover);
+      background: var(--accent-gradient-hover);
     }
   `,
   secondary: css`

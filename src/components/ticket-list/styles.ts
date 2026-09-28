@@ -23,10 +23,10 @@ export const Row = styled.li`
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px 20px;
+  gap: 10px;
+  padding: 12px 16px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: 2px;
   background: var(--color-surface);
   box-shadow: var(--shadow-xs);
   transition:
