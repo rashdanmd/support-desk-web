@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { getTickets } from "@/api/tickets";
-import type { Ticket } from "@/api/tickets/types";
+import type { Ticket, TicketPriority, TicketStatus } from "@/api/tickets/types";
 import TicketList from "@/components/ticket-list";
 import TicketPane, { useTicketPane } from "@/components/ticket-pane";
 import {
   Alert,
+  Button,
   EmptyState,
   Page,
   PageDescription,
@@ -15,7 +16,23 @@ import {
   PageTitle,
 } from "@/components/ui";
 
-import { Count, Search } from "./styles";
+import { Count, Filters, FilterSelect, Search, Toolbar } from "./styles";
+
+const statusOptions: { value: TicketStatus; label: string }[] = [
+  { value: "pending", label: "Pending" },
+  { value: "in_review", label: "In review" },
+  { value: "referred", label: "Referred" },
+  { value: "resolved", label: "Resolved" },
+  { value: "closed", label: "Closed" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+const priorityOptions: { value: TicketPriority; label: string }[] = [
+  { value: "urgent", label: "Urgent" },
+  { value: "high", label: "High" },
+  { value: "medium", label: "Medium" },
+  { value: "low", label: "Low" },
+];
 
 type TicketBoardProps = {
   name: string;
@@ -46,6 +63,8 @@ export default function TicketBoard({ name }: TicketBoardProps) {
   const { selectedId, openTicket, closeTicket } = useTicketPane();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<TicketStatus | "">("");
+  const [priorityFilter, setPriorityFilter] = useState<TicketPriority | "">("");
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
@@ -101,18 +120,42 @@ export default function TicketBoard({ name }: TicketBoardProps) {
     refreshTickets();
   };
 
-  const filteredTickets = tickets.filter((ticket) => {
-    const search = searchTerm.toLowerCase();
+  const filteredTickets = useMemo(() => {
+    const search = searchTerm.trim().toLowerCase();
 
-    return (
-      ticket.title.toLowerCase().includes(search) ||
-      ticket.description.toLowerCase().includes(search) ||
-      ticket.team.name.toLowerCase().includes(search) ||
-      ticket.status.toLowerCase().includes(search) ||
-      ticket.priority.toLowerCase().includes(search) ||
-      ticket.creator.display_name.toLowerCase().includes(search)
-    );
-  });
+    return tickets.filter((ticket) => {
+      if (statusFilter && ticket.status !== statusFilter) {
+        return false;
+      }
+
+      if (priorityFilter && ticket.priority !== priorityFilter) {
+        return false;
+      }
+
+      if (!search) {
+        return true;
+      }
+
+      return (
+        ticket.title.toLowerCase().includes(search) ||
+        ticket.description.toLowerCase().includes(search) ||
+        ticket.team.name.toLowerCase().includes(search) ||
+        ticket.status.toLowerCase().includes(search) ||
+        ticket.priority.toLowerCase().includes(search) ||
+        ticket.creator.display_name.toLowerCase().includes(search)
+      );
+    });
+  }, [priorityFilter, searchTerm, statusFilter, tickets]);
+
+  const filtersActive = Boolean(
+    statusFilter || priorityFilter || searchTerm.trim(),
+  );
+
+  const clearFilters = () => {
+    setStatusFilter("");
+    setPriorityFilter("");
+    setSearchTerm("");
+  };
 
   return (
     <>
@@ -122,7 +165,11 @@ export default function TicketBoard({ name }: TicketBoardProps) {
             <PageTitle>
               Tickets{" "}
               {!isLoading && tickets.length > 0 && (
-                <Count>{tickets.length}</Count>
+                <Count>
+                  {filteredTickets.length === tickets.length
+                    ? tickets.length
+                    : `${filteredTickets.length} of ${tickets.length}`}
+                </Count>
               )}
             </PageTitle>
             <PageDescription>
@@ -130,16 +177,65 @@ export default function TicketBoard({ name }: TicketBoardProps) {
             </PageDescription>
           </div>
 
-          <Search>
-            <SearchIcon />
-            <input
-              type="search"
-              aria-label="Search tickets"
-              placeholder="Search tickets"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-            />
-          </Search>
+          <Toolbar>
+            {!isLoading && tickets.length > 0 && (
+              <Filters role="group" aria-label="Filter tickets">
+                <FilterSelect
+                  aria-label="Status"
+                  value={statusFilter}
+                  data-active={statusFilter ? "true" : undefined}
+                  onChange={(event) =>
+                    setStatusFilter(event.target.value as TicketStatus | "")
+                  }
+                >
+                  <option value="">Status</option>
+                  {statusOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </FilterSelect>
+
+                <FilterSelect
+                  aria-label="Priority"
+                  value={priorityFilter}
+                  data-active={priorityFilter ? "true" : undefined}
+                  onChange={(event) =>
+                    setPriorityFilter(event.target.value as TicketPriority | "")
+                  }
+                >
+                  <option value="">Priority</option>
+                  {priorityOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </FilterSelect>
+
+                {filtersActive && (
+                  <Button
+                    type="button"
+                    $variant="ghost"
+                    $size="sm"
+                    onClick={clearFilters}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </Filters>
+            )}
+
+            <Search>
+              <SearchIcon />
+              <input
+                type="search"
+                aria-label="Search tickets"
+                placeholder="Search tickets"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </Search>
+          </Toolbar>
         </PageHeader>
 
         {loadError && <Alert role="alert">{loadError}</Alert>}
@@ -148,7 +244,9 @@ export default function TicketBoard({ name }: TicketBoardProps) {
           <EmptyState>Loading tickets…</EmptyState>
         ) : filteredTickets.length === 0 ? (
           <EmptyState>
-            {searchTerm ? "No tickets match your search." : "No tickets yet."}
+            {filtersActive
+              ? "No tickets match these filters."
+              : "No tickets yet."}
           </EmptyState>
         ) : (
           <TicketList tickets={filteredTickets} onOpen={openTicket} />
