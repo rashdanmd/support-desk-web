@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-import SignIn from "@/components/pages/sign-in";
-import SignUp from "@/components/pages/sign-up";
+import SignIn from "@/components/pages/auth/sign-in";
+import SignUp from "@/components/pages/auth/sign-up";
 import { TextButton } from "@/components/ui";
 
 import {

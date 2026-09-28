@@ -1,1 +1,1 @@
-export { default } from "@components/pages/sign-in";
+export { default } from "@components/pages/auth/sign-in";
