@@ -8,14 +8,14 @@
 
   --color-text: #18181b;
   --color-text-muted: #52525b;
-  --color-text-subtle: #71717a;
-  --color-text-faint: #a1a1aa;
+  --color-text-subtle: #686870;
+  --color-text-faint: #6a6a72;
 
   --color-accent: #3f608a;
   --color-accent-hover: #344f75;
   --color-accent-subtle: #eef3f8;
   --color-accent-text: #ffffff;
-  --accent-gradient: linear-gradient(180deg, #587ba7 0%, #3f608a 100%);
+  --accent-gradient: linear-gradient(180deg, #4e6f96 0%, #3f608a 100%);
   --accent-gradient-hover: linear-gradient(180deg, #4d6f9b 0%, #344f75 100%);
 
   --color-danger: #dc2626;

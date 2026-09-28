@@ -36,13 +36,20 @@ const navItems = [
 
 function PersonaIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true">
-      <circle cx="10" cy="7" r="3" fill="currentColor" />
-      <path
-        d="M4.5 16.5c1.1-2.3 3.1-3.5 5.5-3.5s4.4 1.2 5.5 3.5"
+    <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true">
+      <circle
+        cx="8"
+        cy="5.25"
+        r="2.15"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.5"
+        strokeWidth="1.25"
+      />
+      <path
+        d="M3.35 13.15c.65-2.05 2.35-3.15 4.65-3.15s4 1.1 4.65 3.15"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.25"
         strokeLinecap="round"
       />
     </svg>

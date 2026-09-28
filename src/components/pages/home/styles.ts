@@ -76,7 +76,7 @@ const summaryTones: Record<
     ring: "#c5e3cf",
   },
   cancelled: {
-    color: "#8b8b93",
+    color: "#686870",
     dot: "#d4d4d8",
     wash: "#f7f7f8",
     ring: "#e4e4e7",

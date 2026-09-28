@@ -9,7 +9,7 @@ const titleColors: Record<TicketStatus, string> = {
   in_review: "#3d4f86",
   referred: "#8a6233",
   resolved: "#3d6b4e",
-  cancelled: "#a1a1aa",
+  cancelled: "#686870",
   closed: "#71717a",
 };
 

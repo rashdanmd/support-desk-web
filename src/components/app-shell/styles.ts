@@ -112,22 +112,33 @@ export const Account = styled.div`
 export const PersonaButton = styled.button`
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--color-border);
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--color-border-strong);
   border-radius: 50%;
-  background: var(--color-surface-hover);
-  color: var(--color-text-muted);
-  transition: border-color 120ms ease;
+  background: var(--color-surface);
+  color: var(--color-text-subtle);
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color 120ms ease,
+    color 120ms ease,
+    background-color 120ms ease;
 
   &:hover {
-    border-color: var(--color-border-strong);
+    border-color: var(--color-text-faint);
+    color: var(--color-text);
+  }
+
+  &[aria-expanded="true"] {
+    border-color: var(--color-accent);
+    background: var(--color-accent-subtle);
+    color: var(--color-accent);
   }
 `;
 
 export const Menu = styled.div`
   position: absolute;
-  top: 40px;
+  top: 38px;
   right: 0;
   min-width: 180px;
   padding: 4px;
