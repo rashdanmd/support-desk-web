@@ -43,7 +43,7 @@ export default function SignIn() {
     <>
       <CardTitle>Sign in</CardTitle>
 
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)}>
         {signInError && <Alert role="alert">{signInError}</Alert>}
 
         <div>
@@ -54,8 +54,13 @@ export default function SignIn() {
             type="email"
             autoComplete="email"
             placeholder="you@company.com"
+            aria-invalid={errors.email ? true : undefined}
             {...register("email", {
-              required: "Email is required",
+              required: "Please enter a valid email address",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Please enter a valid email address",
+              },
             })}
           />
 
@@ -69,8 +74,9 @@ export default function SignIn() {
             id="password"
             type="password"
             autoComplete="current-password"
+            aria-invalid={errors.password ? true : undefined}
             {...register("password", {
-              required: "Password is required",
+              required: "Please enter a valid password",
             })}
           />
 

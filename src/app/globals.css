@@ -18,6 +18,9 @@
 
   --color-danger: #dc2626;
   --color-danger-subtle: #fef2f2;
+  --color-danger-text: #b24c4c;
+  --color-danger-border: #e4c4c4;
+  --focus-ring-danger: 0 0 0 3px rgba(178, 76, 76, 0.16);
 
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -131,6 +134,19 @@ textarea:focus {
   outline: none;
   border-color: var(--color-accent);
   box-shadow: var(--focus-ring);
+}
+
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: var(--color-danger-border);
+}
+
+input[aria-invalid="true"]:focus,
+select[aria-invalid="true"]:focus,
+textarea[aria-invalid="true"]:focus {
+  border-color: var(--color-danger-text);
+  box-shadow: var(--focus-ring-danger);
 }
 
 :focus-visible {

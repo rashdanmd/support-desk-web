@@ -16,18 +16,23 @@ export const signInWithEmail = async (email: string, password: string) => {
 };
 
 export const signUpWithEmail = async (
-  name: string,
+  firstName: string,
+  surname: string,
   email: string,
   password: string,
 ) => {
   const supabase = createClient();
+  const trimmedFirstName = firstName.trim();
+  const trimmedSurname = surname.trim();
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
-        full_name: name,
+        first_name: trimmedFirstName,
+        last_name: trimmedSurname,
+        full_name: `${trimmedFirstName} ${trimmedSurname}`,
       },
     },
   });

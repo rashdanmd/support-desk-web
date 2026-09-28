@@ -6,10 +6,11 @@ import { useForm } from "react-hook-form";
 import { signUpWithEmail } from "@/api/auth";
 import { Alert, CardTitle, FieldError, Form, Notice } from "@/components/ui";
 
-import { FullWidthButton } from "./styles";
+import { FullWidthButton, NameRow } from "./styles";
 
 type SignUpFormData = {
-  name: string;
+  firstName: string;
+  surname: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -31,7 +32,12 @@ export default function SignUp() {
     setSignUpError("");
 
     try {
-      await signUpWithEmail(data.name, data.email, data.password);
+      await signUpWithEmail(
+        data.firstName,
+        data.surname,
+        data.email,
+        data.password,
+      );
 
       setMessage(
         "Account created. Please check your email to confirm your account before signing in.",
@@ -47,22 +53,45 @@ export default function SignUp() {
     <>
       <CardTitle>Create an account</CardTitle>
 
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form noValidate onSubmit={handleSubmit(onSubmit)}>
         {message && <Notice>{message}</Notice>}
         {signUpError && <Alert role="alert">{signUpError}</Alert>}
 
-        <div>
-          <label htmlFor="name">Name</label>
-          <input
-            id="name"
-            type="text"
-            autoComplete="name"
-            {...register("name", {
-              required: "Name is required",
-            })}
-          />
-          {errors.name && <FieldError>{errors.name.message}</FieldError>}
-        </div>
+        <NameRow>
+          <div>
+            <label htmlFor="first-name">First name</label>
+            <input
+              id="first-name"
+              type="text"
+              autoComplete="given-name"
+              aria-invalid={errors.firstName ? true : undefined}
+              {...register("firstName", {
+                validate: (value) =>
+                  value.trim().length > 0 || "Please enter your first name",
+              })}
+            />
+            {errors.firstName && (
+              <FieldError>{errors.firstName.message}</FieldError>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="surname">Surname</label>
+            <input
+              id="surname"
+              type="text"
+              autoComplete="family-name"
+              aria-invalid={errors.surname ? true : undefined}
+              {...register("surname", {
+                validate: (value) =>
+                  value.trim().length > 0 || "Please enter your surname",
+              })}
+            />
+            {errors.surname && (
+              <FieldError>{errors.surname.message}</FieldError>
+            )}
+          </div>
+        </NameRow>
 
         <div>
           <label htmlFor="email">Email</label>
@@ -71,8 +100,13 @@ export default function SignUp() {
             type="email"
             autoComplete="email"
             placeholder="you@company.com"
+            aria-invalid={errors.email ? true : undefined}
             {...register("email", {
-              required: "Email is required",
+              required: "Please enter a valid email address",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Please enter a valid email address",
+              },
             })}
           />
           {errors.email && <FieldError>{errors.email.message}</FieldError>}
@@ -84,8 +118,9 @@ export default function SignUp() {
             id="password"
             type="password"
             autoComplete="new-password"
+            aria-invalid={errors.password ? true : undefined}
             {...register("password", {
-              required: "Password is required",
+              required: "Please enter a valid password",
               minLength: {
                 value: 8,
                 message: "Password must be at least 8 characters",
@@ -103,6 +138,7 @@ export default function SignUp() {
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
+            aria-invalid={errors.confirmPassword ? true : undefined}
             {...register("confirmPassword", {
               required: "Please confirm your password",
               validate: (value) =>

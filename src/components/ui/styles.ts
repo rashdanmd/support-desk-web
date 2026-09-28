@@ -198,9 +198,10 @@ export const Form = styled.form`
 
 export const FieldError = styled.p`
   margin-top: 6px;
-  color: var(--color-danger);
-  font-size: 13px;
-  line-height: 18px;
+  color: var(--color-danger-text);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
 `;
 
 export const FormActions = styled.div`
