@@ -1,27 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+type SignOutProps = {
+  onClick: () => void;
+};
 
-export default function SignOut() {
-  const router = useRouter();
-
-  const handleSignOut = async () => {
-    const supabase = createClient();
-
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      console.error("Sign out failed:", error.message);
-      return;
-    }
-
-    router.push("/");
-    router.refresh();
-  };
-
+export default function SignOut({ onClick }: SignOutProps) {
   return (
-    <button type="button" role="menuitem" onClick={handleSignOut}>
+    <button type="button" role="menuitem" onClick={onClick}>
       Sign out
     </button>
   );

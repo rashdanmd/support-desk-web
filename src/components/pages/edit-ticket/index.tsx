@@ -8,6 +8,7 @@ import { getTicketById, updateTicket } from "@/api/tickets";
 import { getTeams } from "@/api/teams";
 import type { Team } from "@/api/teams";
 import type { Ticket } from "@/api/tickets/types";
+import ConfirmDialog from "@/components/confirm-dialog";
 import {
   Alert,
   Button,
@@ -39,6 +40,10 @@ export default function EditTicket() {
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [updateError, setUpdateError] = useState("");
   const [teams, setTeams] = useState<Team[]>([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [pendingChanges, setPendingChanges] =
+    useState<EditTicketFormData | null>(null);
 
   const router = useRouter();
   const { register, reset, handleSubmit } = useForm<EditTicketFormData>();
@@ -92,6 +97,11 @@ export default function EditTicket() {
     );
   }
 
+  const requestSave = (data: EditTicketFormData) => {
+    setPendingChanges(data);
+    setConfirmOpen(true);
+  };
+
   const onSubmit = async (data: EditTicketFormData) => {
     const id = Number(params.id);
 
@@ -109,6 +119,21 @@ export default function EditTicket() {
     }
   };
 
+  const confirmSave = async () => {
+    if (!pendingChanges) {
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      await onSubmit(pendingChanges);
+    } finally {
+      setIsSaving(false);
+      setConfirmOpen(false);
+    }
+  };
+
   return (
     <NarrowPage>
       <PageHeader>
@@ -123,7 +148,7 @@ export default function EditTicket() {
       {updateError && <Alert role="alert">{updateError}</Alert>}
 
       <FormCard>
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form onSubmit={handleSubmit(requestSave)}>
           <div>
             <label htmlFor="title">Title</label>
             <input id="title" type="text" {...register("title")} />
@@ -185,6 +210,17 @@ export default function EditTicket() {
           </FormActions>
         </Form>
       </FormCard>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Save these changes?"
+        description="This updates the ticket with what you entered."
+        confirmLabel="Save changes"
+        pendingLabel="Saving…"
+        pending={isSaving}
+        onConfirm={confirmSave}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </NarrowPage>
   );
 }

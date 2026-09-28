@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { signUpWithEmail } from "@/api/auth";
+import ConfirmDialog from "@/components/confirm-dialog";
 import { Alert, CardTitle, FieldError, Form, Notice } from "@/components/ui";
 
 import { FullWidthButton, NameRow } from "./styles";
@@ -19,13 +20,23 @@ type SignUpFormData = {
 export default function SignUp() {
   const [message, setMessage] = useState("");
   const [signUpError, setSignUpError] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [pendingAccount, setPendingAccount] = useState<SignUpFormData | null>(
+    null,
+  );
 
   const {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<SignUpFormData>();
+
+  const requestSignUp = (data: SignUpFormData) => {
+    setPendingAccount(data);
+    setConfirmOpen(true);
+  };
 
   const onSubmit = async (data: SignUpFormData) => {
     setMessage("");
@@ -49,11 +60,26 @@ export default function SignUp() {
     }
   };
 
+  const confirmSignUp = async () => {
+    if (!pendingAccount) {
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      await onSubmit(pendingAccount);
+    } finally {
+      setIsCreating(false);
+      setConfirmOpen(false);
+    }
+  };
+
   return (
     <>
       <CardTitle>Create an account</CardTitle>
 
-      <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+      <Form noValidate onSubmit={handleSubmit(requestSignUp)}>
         {message && <Notice>{message}</Notice>}
         {signUpError && <Alert role="alert">{signUpError}</Alert>}
 
@@ -151,10 +177,21 @@ export default function SignUp() {
           )}
         </div>
 
-        <FullWidthButton type="submit" $variant="primary" disabled={isSubmitting}>
-          {isSubmitting ? "Creating account…" : "Create account"}
+        <FullWidthButton type="submit" $variant="primary">
+          Create account
         </FullWidthButton>
       </Form>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Create your account?"
+        description="We'll send a confirmation email to the address you entered."
+        confirmLabel="Create account"
+        pendingLabel="Creating account…"
+        pending={isCreating}
+        onConfirm={confirmSignUp}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </>
   );
 }

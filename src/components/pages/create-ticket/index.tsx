@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { getTeams, type Team } from "@/api/teams";
+import ConfirmDialog from "@/components/confirm-dialog";
 import {
   Button,
   ButtonLink,
@@ -16,10 +18,14 @@ import {
   PageHeader,
   PageTitle,
 } from "@/components/ui";
-import { handleSubmit } from "./handlers";
+import { createTicketFromForm } from "./handlers";
 
 export default function CreateTicket() {
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     const loadTeams = async () => {
@@ -34,6 +40,30 @@ export default function CreateTicket() {
     loadTeams();
   }, []);
 
+  const requestCreate = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setConfirmOpen(true);
+  };
+
+  const confirmCreate = async () => {
+    if (!formRef.current) {
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      await createTicketFromForm(formRef.current);
+      formRef.current.reset();
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to create ticket:", error);
+      setIsCreating(false);
+      setConfirmOpen(false);
+    }
+  };
+
   return (
     <NarrowPage>
       <PageHeader>
@@ -46,7 +76,7 @@ export default function CreateTicket() {
       </PageHeader>
 
       <FormCard>
-        <Form onSubmit={handleSubmit}>
+        <Form ref={formRef} onSubmit={requestCreate}>
           <div>
             <label htmlFor="title">Title</label>
             <input
@@ -122,6 +152,17 @@ export default function CreateTicket() {
           </FormActions>
         </Form>
       </FormCard>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Create this ticket?"
+        description="This sends the request to the help team."
+        confirmLabel="Create ticket"
+        pendingLabel="Creating…"
+        pending={isCreating}
+        onConfirm={confirmCreate}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </NarrowPage>
   );
 }

@@ -13,6 +13,7 @@ import {
 } from "@/api/tickets";
 import type { Ticket } from "@/api/tickets/types";
 import { getCurrentUser, type CurrentUser } from "@/api/users";
+import ConfirmDialog from "@/components/confirm-dialog";
 import {
   Button,
   ButtonLink,
@@ -67,6 +68,8 @@ export default function TicketDetails({
 
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const loadTicket = async () => {
@@ -93,19 +96,15 @@ export default function TicketDetails({
       return;
     }
 
-    const confirmed = window.confirm(
-      "Are you sure you want to permanently delete this ticket?",
-    );
-
-    if (!confirmed) {
-      return;
-    }
+    setIsDeleting(true);
 
     try {
       await deleteTicket(ticket.id);
+      setConfirmDelete(false);
       onClose();
     } catch (error) {
       console.error("Failed to delete ticket:", error);
+      setIsDeleting(false);
     }
   };
 
@@ -227,7 +226,11 @@ export default function TicketDetails({
             </>
           )}
           {canDelete && (
-            <Button type="button" $variant="danger" onClick={handleDelete}>
+            <Button
+              type="button"
+              $variant="danger"
+              onClick={() => setConfirmDelete(true)}
+            >
               Delete
             </Button>
           )}
@@ -303,6 +306,18 @@ export default function TicketDetails({
           </Form>
         </Panel>
       )}
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete this ticket?"
+        description="This permanently removes the ticket. You cannot undo this."
+        confirmLabel="Delete ticket"
+        pendingLabel="Deleting…"
+        tone="danger"
+        pending={isDeleting}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(false)}
+      />
 
       <TicketResponses
         ticketId={ticket.id}

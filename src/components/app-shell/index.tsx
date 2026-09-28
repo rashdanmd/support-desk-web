@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
+import ConfirmDialog from "@/components/confirm-dialog";
 import SignOut from "@/components/sign-out";
 import { ButtonLink } from "@/components/ui";
+import { createClient } from "@/lib/supabase/client";
 
 import {
   Account,
@@ -62,8 +64,11 @@ function PlusIcon() {
 
 export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
     if (!menuOpen) {
@@ -71,12 +76,22 @@ export default function AppShell({ children }: AppShellProps) {
     }
 
     const handlePointerDown = (event: MouseEvent) => {
-      if (!menuRef.current?.contains(event.target as Node)) {
+      const target = event.target;
+
+      if (target instanceof Element && target.closest("[data-confirm-dialog]")) {
+        return;
+      }
+
+      if (!menuRef.current?.contains(target as Node)) {
         setMenuOpen(false);
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (document.querySelector("[data-confirm-dialog]")) {
+        return;
+      }
+
       if (event.key === "Escape") {
         setMenuOpen(false);
       }
@@ -90,6 +105,27 @@ export default function AppShell({ children }: AppShellProps) {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [menuOpen]);
+
+  const requestSignOut = () => {
+    setMenuOpen(false);
+    setConfirmSignOut(true);
+  };
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Sign out failed:", error.message);
+      setIsSigningOut(false);
+      return;
+    }
+
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <Shell>
@@ -141,7 +177,7 @@ export default function AppShell({ children }: AppShellProps) {
 
               {menuOpen && (
                 <Menu role="menu">
-                  <SignOut />
+                  <SignOut onClick={requestSignOut} />
                 </Menu>
               )}
             </Account>
@@ -150,6 +186,17 @@ export default function AppShell({ children }: AppShellProps) {
       </Header>
 
       <Content>{children}</Content>
+
+      <ConfirmDialog
+        open={confirmSignOut}
+        title="Sign out?"
+        description="You'll need to sign in again to view tickets."
+        confirmLabel="Sign out"
+        pendingLabel="Signing out…"
+        pending={isSigningOut}
+        onConfirm={handleSignOut}
+        onCancel={() => setConfirmSignOut(false)}
+      />
     </Shell>
   );
 }
