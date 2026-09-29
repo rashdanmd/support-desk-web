@@ -11,13 +11,13 @@
   --color-text-subtle: #686870;
   --color-text-faint: #6a6a72;
 
-  --color-accent: #3f608a;
-  --color-accent-hover: #344f75;
-  --color-accent-subtle: #eef3f8;
+  --color-accent: #7c3aed;
+  --color-accent-hover: #6d28d9;
+  --color-accent-subtle: #f3effe;
   --color-accent-text: #ffffff;
-  --color-secondary: #5b6e82;
-  --accent-gradient: linear-gradient(180deg, #4e6f96 0%, #3f608a 100%);
-  --accent-gradient-hover: linear-gradient(180deg, #4d6f9b 0%, #344f75 100%);
+  --color-secondary: #6b6488;
+  --accent-gradient: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
+  --accent-gradient-hover: linear-gradient(180deg, #7c4ef0 0%, #6d28d9 100%);
 
   --color-danger: #dc2626;
   --color-danger-subtle: #fef2f2;
@@ -31,7 +31,7 @@
 
   --shadow-xs: 0 1px 2px rgba(24, 24, 27, 0.04);
   --shadow-popover: 0 4px 16px rgba(24, 24, 27, 0.08);
-  --focus-ring: 0 0 0 3px rgba(63, 96, 138, 0.18);
+  --focus-ring: 0 0 0 3px rgba(124, 58, 237, 0.2);
 
   --font-sans:
     var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
