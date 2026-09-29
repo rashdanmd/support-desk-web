@@ -19,10 +19,14 @@ import {
 } from "./styles";
 
 type AuthProps = {
+  demoEnabled?: boolean;
   demoUnavailable?: boolean;
 };
 
-export default function Auth({ demoUnavailable = false }: AuthProps) {
+export default function Auth({
+  demoEnabled = false,
+  demoUnavailable = false,
+}: AuthProps) {
   const [isSignUp, setIsSignUp] = useState(false);
 
   return (
@@ -54,7 +58,7 @@ export default function Auth({ demoUnavailable = false }: AuthProps) {
           </Switch>
         )}
 
-        <DemoSignIn unavailable={demoUnavailable} />
+        {demoEnabled && <DemoSignIn unavailable={demoUnavailable} />}
       </Container>
     </Layout>
   );

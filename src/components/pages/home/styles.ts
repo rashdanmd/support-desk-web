@@ -240,7 +240,7 @@ export const FilterSelect = styled.select`
   &[data-active="true"] {
     border-color: transparent;
     background-color: var(--color-accent-subtle);
-    background-image: ${chevron("#3f608a")};
+    background-image: ${chevron("#7c3aed")};
     color: var(--color-accent);
   }
 `;

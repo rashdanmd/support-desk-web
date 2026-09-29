@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import AppShell from "@/components/app-shell";
 import Auth from "@/components/pages/auth";
+import { isDemoEnabled } from "@/lib/demo";
 import { greetingName } from "@/lib/greeting";
 import { createClient } from "@/lib/supabase/server";
 
@@ -20,7 +21,14 @@ export default async function Home({ searchParams }: HomeProps) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return <Auth demoUnavailable={params.demo === "unavailable"} />;
+    const demoEnabled = isDemoEnabled();
+
+    return (
+      <Auth
+        demoEnabled={demoEnabled}
+        demoUnavailable={demoEnabled && params.demo === "unavailable"}
+      />
+    );
   }
 
   const name = greetingName(user);
