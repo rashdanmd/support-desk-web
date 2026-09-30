@@ -1,7 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
 const port = 3000;
-const baseURL = `http://127.0.0.1:${port}`;
+const baseURL = `http://localhost:${port}`;
 
 export default defineConfig({
   timeout: 90_000,

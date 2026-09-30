@@ -3,7 +3,9 @@ import { expect, type Page } from "@playwright/test";
 export const signInAs = async (page: Page, role: "user" | "support") => {
   const label = role === "user" ? "Explore as user" : "Explore as support";
   const board = page.getByRole("heading", { name: "Support requests" });
-  const unavailable = page.getByRole("alert");
+  const unavailable = page.getByRole("alert").filter({
+    hasText: "Demo sign-in is not available right now.",
+  });
 
   await page.goto("/");
   await page.getByRole("button", { name: label }).click();

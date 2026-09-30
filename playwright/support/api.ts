@@ -1,6 +1,10 @@
 import type { Page, Route } from "@playwright/test";
 
-import type { CreateTicketData, Ticket } from "../../src/api/tickets/types";
+import type {
+  CreateTicketData,
+  Ticket,
+  UpdateTicketData,
+} from "../../src/api/tickets/types";
 import type { CurrentUser } from "../../src/api/users";
 
 import { SIGNED_IN_USER, ticket } from "./tickets";
@@ -11,7 +15,7 @@ type Team = {
   description: string | null;
 };
 
-type StubOptions = {
+export type StubOptions = {
   tickets?: Ticket[];
   role?: CurrentUser["role"];
   teams?: Team[];
@@ -141,7 +145,7 @@ export const stubSupportApi = async (
 
     const cancelMatch = pathname.match(/^\/api\/tickets\/(\d+)\/cancel$/);
 
-    if (cancelMatch && method === "POST") {
+    if (cancelMatch && (method === "POST" || method === "PATCH")) {
       const id = Number(cancelMatch[1]);
       const index = tickets.findIndex((item) => item.id === id);
 
@@ -169,6 +173,33 @@ export const stubSupportApi = async (
     }
 
     const ticketMatch = pathname.match(/^\/api\/tickets\/(\d+)$/);
+
+    if (ticketMatch && method === "PATCH") {
+      const index = tickets.findIndex(
+        (item) => item.id === Number(ticketMatch[1]),
+      );
+
+      if (index === -1) {
+        await fulfill(route, { status: 404, json: {} });
+        return;
+      }
+
+      const body = request.postDataJSON() as UpdateTicketData;
+      const team = teams.find((item) => item.id === body.teamId);
+
+      tickets[index] = {
+        ...tickets[index],
+        title: body.title ?? tickets[index].title,
+        description: body.description ?? tickets[index].description,
+        team_id: body.teamId ?? tickets[index].team_id,
+        priority: body.priority ?? tickets[index].priority,
+        affected_url: body.affectedUrl ?? tickets[index].affected_url,
+        curl: body.curl ?? tickets[index].curl,
+        team: team ?? tickets[index].team,
+      };
+      await fulfill(route, { json: forViewer(tickets[index], viewerId) });
+      return;
+    }
 
     if (ticketMatch && method === "GET") {
       const found = tickets.find((item) => item.id === Number(ticketMatch[1]));
