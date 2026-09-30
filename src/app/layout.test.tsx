@@ -13,7 +13,7 @@ import RootLayout, { metadata } from "./layout";
 describe("root layout", () => {
   it("describes the app and renders the page", () => {
     const html = renderToStaticMarkup(
-      <RootLayout>
+      <RootLayout params={Promise.resolve({})}>
         <p>Desk child</p>
       </RootLayout>,
     );

@@ -12,7 +12,10 @@
     "test:unit": "TZ=UTC vitest run --project unit",
     "test:unit:watch": "TZ=UTC vitest --project unit",
     "test:components": "TZ=UTC vitest run --project ui",
-    "test:components:watch": "TZ=UTC vitest --project ui"
+    "test:components:watch": "TZ=UTC vitest --project ui",
+    "test:functionals": "playwright test --project=functionals",
+    "test:e2e": "playwright test --project=e2e",
+    "test:smoke": "playwright test --project=smoke"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -24,6 +27,8 @@
     "styled-components": "^6.5.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^20",
